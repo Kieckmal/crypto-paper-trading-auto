@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>100€ Crypto Paper Trading</title>
+  <style>
+    :root {
+      --bg:#0f1115; --card:#171a21; --soft:#11141a; --line:#2a2f3a;
+      --text:#f2f4f8; --muted:#9aa4b2; --good:#2ecc71; --bad:#ff5c5c;
+      --warn:#f5c542; --btn:#2d6cdf;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      padding:16px 16px 90px;
+    }
+    h1{font-size:24px;margin:8px 0 4px}
+    h2{font-size:17px;margin:0 0 12px}
+    p,small{color:var(--muted)}
+    .grid{display:grid;gap:12px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .stat{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px}
+    .label{color:var(--muted);font-size:12px}.value{font-size:20px;font-weight:800;margin-top:4px}
+    input,textarea,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#0d1016;color:var(--text);font-size:16px}
+    textarea{min-height:70px}
+    button{border:0;border-radius:10px;padding:12px;background:var(--btn);color:#fff;font-weight:800;font-size:15px}
+    button.secondary{background:#303744}button.danger{background:#b23b3b}button.good{background:#218c54}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .item{border-top:1px solid var(--line);padding:12px 0}.item:first-child{border-top:0;padding-top:0}
+    .coin{font-weight:900;font-size:17px}.muted{color:var(--muted);font-size:13px}
+    .goodText{color:var(--good)}.badText{color:var(--bad)}.warnText{color:var(--warn)}
+    .pill{display:inline-block;padding:3px 8px;border-radius:999px;font-size:12px;background:#273044;color:var(--text)}
+    .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.actions button{flex:1;min-width:92px}
+    .hint{background:#101722;border:1px solid #213047;border-radius:12px;padding:10px;margin-top:8px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  </style>
+</head>
+<body>
+  <h1>100€ Crypto Paper Trading</h1>
+  <p>Virtuelles Depot. Kursdaten automatisch per CoinGecko. Keine echten Orders.</p>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Depot</h2>
+      <div class="stats">
+        <div class="stat"><div class="label">Cash</div><div class="value" id="cash">100,00 €</div></div>
+        <div class="stat"><div class="label">Depotwert</div><div class="value" id="equity">100,00 €</div></div>
+        <div class="stat"><div class="label">Offene Position</div><div class="value" id="position">Keine</div></div>
+        <div class="stat"><div class="label">P/L</div><div class="value" id="pl">0,00 €</div></div>
+      </div>
+      <div class="actions">
+        <button onclick="refreshAll()">Alle Kurse aktualisieren</button>
+        <button class="secondary" onclick="exportData()">Export</button>
+        <button class="danger" onclick="resetAll()">Reset</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Coin suchen & hinzufügen</h2>
+      <input id="coinQuery" placeholder="Name/Symbol: solana, btc, ethereum, hype">
+      <br><br>
+      <button onclick="lookupCoin()">Kurs automatisch ziehen</button>
+      <div id="lookupResult" class="hint" style="display:none"></div>
+      <br>
+      <textarea id="notes" placeholder="Eigene Notiz: Setup, News, Widerstand, Grund für Watchlist"></textarea>
+      <br><br>
+      <button class="good" onclick="addLookupToWatchlist()">Zur Watchlist hinzufügen</button>
+      <small>
+        Tipp: Bei Symbolen wie „hype“ oder „tao“ kann es mehrere Treffer geben. Die App nimmt den Top-Treffer nach Market Cap/Volumen.
+      </small>
+    </section>
+
+    <section class="card">
+      <h2>Watchlist</h2>
+      <div id="watchlist"></div>
+    </section>
+
+    <section class="card">
+      <h2>Trade</h2>
+      <div class="row3">
+        <input id="tradeSymbol" placeholder="Symbol">
+        <input id="tradePrice" type="number" step="0.00000001" placeholder="Kurs €">
+        <input id="tradeAmount" type="number" step="1" placeholder="€ Einsatz">
+      </div>
+      <br>
+      <div class="row">
+        <input id="stopLoss" type="number" step="0.00000001" placeholder="Stop-Loss Kurs">
+        <input id="takeProfit" type="number" step="0.00000001" placeholder="Take-Profit Kurs">
+      </div>
+      <br>
+      <button class="good" onclick="buy()">Kaufen</button>
+      <br><br>
+      <div class="row">
+        <input id="sellPrice" type="number" step="0.00000001" placeholder="Verkaufskurs">
+        <button class="danger" onclick="sell()">Verkaufen</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Trade-Historie</h2>
+      <div id="history"></div>
+    </section>
+  </div>
+
+<script>
+const KEY = "cryptoPaperTrading100_v2";
+const API = "https://api.coingecko.com/api/v3/simple/price";
+let lastLookup = null;
+
+let state = JSON.parse(localStorage.getItem(KEY)) || {
+  cash: 100,
+  position: null,
+  watchlist: [],
+  history: []
+};
+
+function eur(n){
+  const x = Number(n)||0;
+  if (Math.abs(x) < 0.01 && x !== 0) return x.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:8}) + " €";
+  return x.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+}
+function num(n){ return Number(n||0).toLocaleString("de-DE",{maximumFractionDigits:8}); }
+function pct(n){ return `${Number(n||0).toFixed(2)}%`; }
+function now(){ return new Date().toLocaleString("de-DE"); }
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); render(); }
+
+function coinParam(q){
+  q = q.trim();
+  const lower = q.toLowerCase();
+  const aliases = {
+    "btc":"bitcoin","bitcoin":"bitcoin",
+    "eth":"ethereum","ethereum":"ethereum",
+    "sol":"solana","solana":"solana",
+    "near":"near","near protocol":"near",
+    "ondo":"ondo-finance","ondo finance":"ondo-finance",
+    "tao":"bittensor","bittensor":"bittensor",
+    "aero":"aerodrome-finance","aerodrome":"aerodrome-finance",
+    "hype":"hyperliquid","hyperliquid":"hyperliquid"
+  };
+  return aliases[lower] || lower.replaceAll(" ", "-");
+}
+
+async function fetchCoin(q){
+  const id = coinParam(q);
+  const url = `${API}?ids=${encodeURIComponent(id)}&vs_currencies=eur&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true&include_last_updated_at=true&precision=full`;
+  let r = await fetch(url);
+  let data = await r.json();
+
+  if (!data[id]) {
+    const bySymbol = `${API}?symbols=${encodeURIComponent(q.trim().toLowerCase())}&vs_currencies=eur&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true&include_last_updated_at=true&precision=full`;
+    r = await fetch(bySymbol);
+    data = await r.json();
+    const key = Object.keys(data)[0];
+    if (!key) throw new Error("Coin nicht gefunden. Versuche den vollständigen Namen, z.B. solana statt sol.");
+    return normalizeCoin(key, data[key], q);
+  }
+
+  return normalizeCoin(id, data[id], q);
+}
+
+function normalizeCoin(id, d, query){
+  return {
+    id,
+    query,
+    symbol: query.trim().toUpperCase(),
+    price: d.eur,
+    chg24: d.eur_24h_change ?? 0,
+    vol24: d.eur_24h_vol ?? 0,
+    marketCap: d.eur_market_cap ?? 0,
+    lastUpdated: d.last_updated_at ? new Date(d.last_updated_at * 1000).toLocaleString("de-DE") : "unbekannt",
+    fetchedAt: now()
+  };
+}
+
+async function lookupCoin(){
+  const q = document.getElementById("coinQuery").value.trim();
+  if (!q) return alert("Coin-Namen eingeben.");
+  const box = document.getElementById("lookupResult");
+  box.style.display = "block";
+  box.innerHTML = "Lade Kursdaten...";
+  try {
+    lastLookup = await fetchCoin(q);
+    box.innerHTML = `
+      <div class="coin">${lastLookup.symbol} <span class="pill">${lastLookup.id}</span></div>
+      <div>Kurs: <b>${eur(lastLookup.price)}</b></div>
+      <div>24h: <b class="${lastLookup.chg24 >= 0 ? "goodText":"badText"}">${pct(lastLookup.chg24)}</b></div>
+      <div>24h Volumen: <b>${eur(lastLookup.vol24)}</b></div>
+      <div>Market Cap: <b>${eur(lastLookup.marketCap)}</b></div>
+      <div class="muted">Letztes API-Update: ${lastLookup.lastUpdated}</div>
+    `;
+  } catch(e) {
+    box.innerHTML = `<span class="badText">${e.message}</span>`;
+  }
+}
+
+function addLookupToWatchlist(){
+  if (!lastLookup) return alert("Erst Kurs automatisch ziehen.");
+  const notes = document.getElementById("notes").value.trim();
+  const existing = state.watchlist.findIndex(c => c.id === lastLookup.id);
+  const item = {...lastLookup, notes};
+  if (existing >= 0) state.watchlist[existing] = item;
+  else state.watchlist.push(item);
+  document.getElementById("notes").value = "";
+  save();
+}
+
+function signal(c){
+  let score = 0;
+  if (c.chg24 > 0) score++;
+  if (c.vol24 >= 10000000) score++;
+  if (c.marketCap >= 50000000) score++;
+  if ((c.notes||"").length > 10) score++;
+  if (score >= 4) return ["KAUF-KANDIDAT", "goodText"];
+  if (score >= 2) return ["BEOBACHTEN", "warnText"];
+  return ["FINGER WEG", "badText"];
+}
+
+async function refreshAll(){
+  if (!state.watchlist.length) return alert("Watchlist ist leer.");
+  for (let i=0; i<state.watchlist.length; i++) {
+    try {
+      const fresh = await fetchCoin(state.watchlist[i].id);
+      state.watchlist[i] = {...state.watchlist[i], ...fresh, symbol: state.watchlist[i].symbol, notes: state.watchlist[i].notes};
+    } catch(e) {}
+  }
+  save();
+}
+
+function render(){
+  let posVal = 0, pl = 0, livePrice = null;
+  if (state.position) {
+    const live = state.watchlist.find(x => x.symbol.toUpperCase() === state.position.symbol.toUpperCase() || x.id === state.position.id);
+    livePrice = live ? live.price : state.position.entry;
+    posVal = state.position.qty * livePrice;
+    pl = posVal - state.position.amount;
+  }
+
+  document.getElementById("cash").textContent = eur(state.cash);
+  document.getElementById("equity").textContent = eur(state.cash + posVal);
+  document.getElementById("position").textContent = state.position ? `${state.position.symbol} ${eur(posVal)}` : "Keine";
+  const plEl = document.getElementById("pl");
+  plEl.textContent = eur(pl);
+  plEl.className = "value " + (pl >= 0 ? "goodText" : "badText");
+
+  const wl = document.getElementById("watchlist");
+  wl.innerHTML = state.watchlist.length ? "" : "<small>Noch keine Coins. Oben Coin-Namen eingeben.</small>";
+  state.watchlist.forEach((c, idx) => {
+    const [s, cls] = signal(c);
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div><span class="coin">${c.symbol}</span> <span class="pill ${cls}">${s}</span></div>
+      <div>Kurs: <b>${eur(c.price)}</b> | 24h: <b class="${c.chg24 >= 0 ? "goodText":"badText"}">${pct(c.chg24)}</b></div>
+      <div class="muted">Volumen: ${eur(c.vol24)} | Market Cap: ${eur(c.marketCap)}</div>
+      <div class="muted">ID: <span class="mono">${c.id}</span> | Update: ${c.lastUpdated || c.fetchedAt}</div>
+      <div class="muted">${c.notes || ""}</div>
+      <div class="actions">
+        <button onclick="prefill(${idx})">Trade vorbereiten</button>
+        <button class="secondary" onclick="refreshOne(${idx})">Aktualisieren</button>
+        <button class="danger" onclick="removeCoin(${idx})">Entfernen</button>
+      </div>`;
+    wl.appendChild(div);
+  });
+
+  const hist = document.getElementById("history");
+  hist.innerHTML = state.history.length ? "" : "<small>Noch keine Trades.</small>";
+  state.history.slice().reverse().forEach(h => {
+    const div = document.createElement("div");
+    div.className = "item";
+    const cls = h.pl >= 0 ? "goodText" : "badText";
+    div.innerHTML = `
+      <div class="coin">${h.type} ${h.symbol}</div>
+      <div class="muted">${h.date}</div>
+      <div class="muted">Entry: ${h.entry ?? "-"} | Exit: ${h.exit ?? "-"} | Einsatz: ${eur(h.amount)}</div>
+      ${h.pl !== undefined ? `<div class="${cls}">P/L: ${eur(h.pl)}</div>` : ""}
+    `;
+    hist.appendChild(div);
+  });
+}
+
+async function refreshOne(i){
+  try {
+    const fresh = await fetchCoin(state.watchlist[i].id);
+    state.watchlist[i] = {...state.watchlist[i], ...fresh, symbol: state.watchlist[i].symbol, notes: state.watchlist[i].notes};
+    save();
+  } catch(e) { alert(e.message); }
+}
+
+function removeCoin(i){ state.watchlist.splice(i,1); save(); }
+
+function prefill(i){
+  const c = state.watchlist[i];
+  document.getElementById("tradeSymbol").value = c.symbol;
+  document.getElementById("tradePrice").value = c.price;
+  document.getElementById("tradeAmount").value = Math.min(100, state.cash).toFixed(2);
+  document.getElementById("sellPrice").value = c.price;
+  document.getElementById("stopLoss").value = (c.price * 0.90).toFixed(8);
+  document.getElementById("takeProfit").value = (c.price * 1.20).toFixed(8);
+}
+
+function buy(){
+  if (state.position) return alert("Nur eine offene Position gleichzeitig.");
+  const symbol = document.getElementById("tradeSymbol").value.trim().toUpperCase();
+  const entry = Number(document.getElementById("tradePrice").value);
+  const amount = Number(document.getElementById("tradeAmount").value);
+  if (!symbol || !entry || !amount) return alert("Symbol, Kurs und Einsatz eintragen.");
+  if (amount > state.cash) return alert("Nicht genug Cash.");
+  state.cash -= amount;
+  state.position = {
+    symbol, entry, amount, qty: amount / entry,
+    stopLoss: Number(document.getElementById("stopLoss").value)||null,
+    takeProfit: Number(document.getElementById("takeProfit").value)||null,
+    date: now()
+  };
+  state.history.push({type:"BUY", symbol, entry, amount, date:now()});
+  save();
+}
+
+function sell(){
+  if (!state.position) return alert("Keine offene Position.");
+  const exit = Number(document.getElementById("sellPrice").value);
+  if (!exit) return alert("Verkaufskurs eintragen.");
+  const p = state.position;
+  const value = p.qty * exit;
+  const pl = value - p.amount;
+  state.cash += value;
+  state.history.push({type:"SELL", symbol:p.symbol, entry:p.entry, exit, amount:p.amount, pl, date:now()});
+  state.position = null;
+  save();
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "crypto-paper-trading-export.json";
+  a.click();
+}
+
+function resetAll(){
+  if (!confirm("Alles löschen und wieder bei 100 € starten?")) return;
+  state = { cash:100, position:null, watchlist:[], history:[] };
+  save();
+}
+
+render();
+</script>
+</body>
+</html>
