@@ -20,15 +20,16 @@
    <div class="stat"><div class="label">Offene Positionen</div><div class="value" id="posCount">0</div></div>
    <div class="stat"><div class="label">Gesamt P/L</div><div class="value" id="pl">0 €</div></div>
   </div><div class="actions"><button onclick="scan()">Markt scannen</button><button class="secondary" onclick="refreshPositions()">Positionen aktualisieren</button></div><p class="loader" id="loader">Lade Daten...</p><small id="lastScan">Noch kein Scan.</small></div>
-  <div class="two"><div class="card"><h2>Top 5 Kandidaten</h2><div id="top5" class="rank"><div class="notice">Noch kein Scan.</div></div></div><div class="card"><h2>Marktlage</h2><div id="pulse" class="notice">Noch keine Daten.</div></div></div>
+  <div class="two"><div class="card"><h2>Top Kandidaten</h2><div id="top5" class="rank"><div class="notice">Noch kein Scan.</div></div></div><div class="card"><h2>Marktlage</h2><div id="pulse" class="notice">Noch keine Daten.</div></div></div>
   <div class="card"><h2>Depotverlauf</h2><canvas id="chart" class="chart"></canvas></div>
  </section>
 
  <section id="scanner" class="section">
-  <div class="card"><h2>Scanner</h2><p>Grüne Kandidaten können einzeln oder als Korb gekauft werden. Der Betrag wird gleichmäßig aufgeteilt.</p>
+  <div class="card"><h2>Scanner</h2><p>Die Ansicht zeigt jetzt eine breitere Rangliste. Du kannst Top 25, Grün, Gelb, High Risk oder unsere 5 Coins filtern. Korb-Käufe können gleich oder scoregewichtet aufgeteilt werden.</p>
    <div class="row"><select id="scanSize"><option value="50">Top 50</option><option value="100" selected>Top 100</option><option value="150">Top 150</option><option value="250">Top 250</option></select><button onclick="scan()">Scannen</button></div><br>
-   <div class="row"><input id="basketAmount" type="number" step="1" placeholder="Betrag für Korb, leer = gesamtes Cash"><button class="good" onclick="buyBasket()">Alle grünen kaufen</button></div><br>
-   <div class="smallBtns"><button onclick="mode='buy';render()">Grün</button><button onclick="mode='watch';render()">Gelb</button><button onclick="mode='risk';render()">High Risk</button><button onclick="mode='all';render()">Top 25</button><button onclick="mode='fixed';render()">Unsere 5</button></div>
+   <div class="row"><input id="basketAmount" type="number" step="1" placeholder="Betrag für Korb, leer = gesamtes Cash"><select id="basketCount"><option value="5">Top 5 kaufen</option><option value="8" selected>Top 8 kaufen</option><option value="10">Top 10 kaufen</option><option value="15">Top 15 kaufen</option></select></div><br>
+   <div class="row"><button class="good" onclick="buyBasketWeighted()">Scoregewichtet kaufen</button><button class="secondary" onclick="buyBasketEqual()">Gleich verteilt kaufen</button></div><br>
+   <div class="smallBtns"><button onclick="mode='all';render()">Top 50</button><button onclick="mode='buy';render()">Grün ≥80</button><button onclick="mode='watch';render()">Gelb 65–79</button><button onclick="mode='risk';render()">High Risk 50–64</button><button onclick="mode='fixed';render()">Unsere 5</button></div>
   </div><div id="results"></div>
  </section>
 
@@ -53,7 +54,7 @@
 const API="https://api.coingecko.com/api/v3";
 const KEY="cryptoScoutV4";
 const FIXED=["bitcoin","solana","hyperliquid","bittensor","ondo-finance"];
-let mode="buy";
+let mode="all";
 let state=JSON.parse(localStorage.getItem(KEY))||{cash:100,start:100,positions:[],scans:[],history:[],equity:[{date:new Date().toISOString(),value:100}],lastScan:""};
 if(!Array.isArray(state.positions)){state.positions=state.position?[state.position]:[];delete state.position}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
@@ -89,14 +90,59 @@ function equity(){return state.cash+state.positions.reduce((a,p)=>a+p.qty*(p.las
 function pushEquity(){let v=equity(),l=state.equity.at(-1);if(!l||Math.abs(l.value-v)>.001){state.equity.push({date:new Date().toISOString(),value:v});if(state.equity.length>160)state.equity=state.equity.slice(-160)}}
 function prepare(c){document.getElementById("tradeId").value=c.id;document.getElementById("tradeSymbol").value=c.symbol.toUpperCase();document.getElementById("tradePrice").value=c.current_price;document.getElementById("tradeAmount").value=Math.min(state.cash,100).toFixed(2);document.getElementById("stopLoss").value=c.stop.toFixed(8);document.getElementById("takeProfit").value=c.target.toFixed(8);document.getElementById("tradeNote").value=`Score ${c.score}/100. ${c.verdict}.`;document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById("trade").classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab")[2].classList.add("active");render()}
 function buyOne(){let id=tradeId.value.trim(),symbol=tradeSymbol.value.trim().toUpperCase(),entry=Number(tradePrice.value),amount=Number(tradeAmount.value),stop=Number(stopLoss.value),target=Number(takeProfit.value),note=tradeNote.value.trim();if(!id||!symbol||!entry||!amount)return alert("Daten fehlen.");if(amount>state.cash)return alert("Nicht genug Cash.");if(state.positions.find(p=>p.id===id))return alert("Position schon offen.");state.cash-=amount;state.positions.push({id,symbol,entry,amount,qty:amount/entry,stop,target,note,date:new Date().toISOString(),lastPrice:entry});state.history.push({type:"BUY",id,symbol,entry,amount,note,date:new Date().toISOString()});pushEquity();save()}
-function buyBasket(){let picks=state.scans.filter(c=>c.score>=80&&c.id!=="bitcoin"&&!state.positions.find(p=>p.id===c.id)).slice(0,8);if(!picks.length)return alert("Keine neuen grünen Kandidaten.");let total=Number(document.getElementById("basketAmount").value)||state.cash;if(total>state.cash)return alert("Nicht genug Cash.");let each=total/picks.length;if(each<1)return alert("Betrag pro Coin zu klein.");if(!confirm(`${picks.length} grüne Kandidaten kaufen? Pro Coin: ${eur(each)}`))return;for(let c of picks){let entry=c.current_price,amount=each;state.cash-=amount;state.positions.push({id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,qty:amount/entry,stop:c.stop,target:c.target,note:`Korb-Kauf Score ${c.score}/100`,date:new Date().toISOString(),lastPrice:entry});state.history.push({type:"BUY",id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,note:`Korb-Kauf Score ${c.score}/100`,date:new Date().toISOString()})}pushEquity();save()}
+
+function basketCandidates(){
+  let max=Number(document.getElementById("basketCount")?.value||8);
+  // Breiter: ab Score 65, aber keine BTC und keine bereits offene Position.
+  return state.scans
+    .filter(c=>c.score>=65&&c.id!=="bitcoin"&&!state.positions.find(p=>p.id===c.id))
+    .slice(0,max);
+}
+function getBasketTotal(){
+  let total=Number(document.getElementById("basketAmount").value)||state.cash;
+  if(total>state.cash){alert("Nicht genug Cash.");return null}
+  if(total<=0){alert("Kein Cash verfügbar.");return null}
+  return total;
+}
+function openBasket(picks, allocations, label){
+  if(!picks.length)return alert("Keine neuen Kandidaten in diesem Filter.");
+  if(!confirm(`${picks.length} Kandidaten kaufen? Methode: ${label}`))return;
+  picks.forEach((c,i)=>{
+    let amount=allocations[i];
+    if(amount<1)return;
+    let entry=c.current_price;
+    state.cash-=amount;
+    state.positions.push({id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,qty:amount/entry,stop:c.stop,target:c.target,note:`${label}. Score ${c.score}/100`,date:new Date().toISOString(),lastPrice:entry});
+    state.history.push({type:"BUY",id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,note:`${label}. Score ${c.score}/100`,date:new Date().toISOString()});
+  });
+  pushEquity();save();
+}
+function buyBasketEqual(){
+  let picks=basketCandidates(),total=getBasketTotal();if(total===null)return;
+  let each=total/picks.length;if(each<1)return alert("Betrag pro Coin zu klein.");
+  openBasket(picks,picks.map(()=>each),"Korb gleich verteilt");
+}
+function buyBasketWeighted(){
+  let picks=basketCandidates(),total=getBasketTotal();if(total===null)return;
+  if(!picks.length)return alert("Keine Kandidaten.");
+  // Scoregewichtet mit Deckel: stärkster Coin max. 35%, schwächster mind. 5%.
+  let weights=picks.map(c=>Math.max(c.score-60,5));
+  let sum=weights.reduce((a,b)=>a+b,0);
+  let raw=weights.map(w=>total*w/sum);
+  let cap=total*0.35, floor=Math.min(total*0.05,total/picks.length);
+  let capped=raw.map(x=>Math.max(floor,Math.min(cap,x)));
+  let scale=total/capped.reduce((a,b)=>a+b,0);
+  let allocations=capped.map(x=>x*scale);
+  if(Math.min(...allocations)<1)return alert("Betrag pro Coin zu klein.");
+  openBasket(picks,allocations,"Korb scoregewichtet");
+}
 async function refreshPositions(){if(!state.positions.length)return;try{status("Aktualisiere");let data=await markets(state.positions.map(p=>p.id),250),by=new Map(data.map(c=>[c.id,c]));state.positions.forEach(p=>{let c=by.get(p.id);if(c)p.lastPrice=c.current_price});pushEquity();save();status("Aktualisiert")}catch(e){alert(e.message);status("Fehler")}}
 function sellAt(i){let p=state.positions[i];if(!p)return;let exit=p.lastPrice||p.entry,value=p.qty*exit,pl=value-p.amount;state.cash+=value;state.history.push({type:"SELL",id:p.id,symbol:p.symbol,entry:p.entry,exit,amount:p.amount,pl,note:p.note,date:new Date().toISOString()});state.positions.splice(i,1);pushEquity();save()}
 function card(c){return `<div class="coin"><div class="head"><div><div class="name">${c.symbol.toUpperCase()} · ${c.name}</div><small>${c.id}</small></div><div class="score ${c.color}" style="--s:${c.score}">${c.score}</div></div><div><span class="pill ${c.color}">${c.verdict}</span></div><div class="metrics"><div class="metric"><span class="label">Kurs</span><b>${eur(c.current_price)}</b></div><div class="metric"><span class="label">24h</span><b class="${c.ch24>=0?'goodText':'badText'}">${pct(c.ch24)}</b></div><div class="metric"><span class="label">Rel. Vol</span><b>${c.relVol.toFixed(2)}x</b></div><div class="metric"><span class="label">BTC-Stärke</span><b class="${c.rel>=0?'goodText':'badText'}">${pct(c.rel)}</b></div><div class="metric"><span class="label">Stop</span><b>${eur(c.stop)}</b></div><div class="metric"><span class="label">Ziel</span><b>${eur(c.target)}</b></div></div><div>${c.reasons.slice(0,6).map(r=>`<div><span>${r[0]}</span> ${r[1]}</div>`).join("")}</div><div class="actions"><button class="good" onclick='prepare(${JSON.stringify(c).replaceAll("'","&apos;")})'>Trade vorbereiten</button></div></div>`}
 function render(){let eq=equity(),pl=eq-state.start;cash.textContent=eur(state.cash);document.getElementById("equity").textContent=eur(eq);posCount.textContent=state.positions.length;let plEl=document.getElementById("pl");plEl.textContent=eur(pl);plEl.className="value "+(pl>=0?"goodText":"badText");if(state.lastScan)lastScan.textContent=state.lastScan;renderTop();renderPulse();renderResults();renderPositions();renderHistory();draw()}
-function renderTop(){let picks=state.scans.filter(c=>c.score>=65&&c.id!=="bitcoin").slice(0,5);top5.innerHTML=picks.length?picks.map((c,i)=>`<div class="rankItem"><div class="rankNo">${i+1}</div><div><b>${c.symbol.toUpperCase()} · ${c.name}</b><br><small>${c.verdict} · 24h ${pct(c.ch24)} · RelVol ${c.relVol.toFixed(2)}x</small></div><span class="pill ${c.color}">${c.score}</span></div>`).join(""):`<div class="notice">Noch kein Scan.</div>`}
+function renderTop(){let picks=state.scans.filter(c=>c.score>=65&&c.id!=="bitcoin").slice(0,10);top5.innerHTML=picks.length?picks.map((c,i)=>`<div class="rankItem"><div class="rankNo">${i+1}</div><div><b>${c.symbol.toUpperCase()} · ${c.name}</b><br><small>${c.verdict} · 24h ${pct(c.ch24)} · RelVol ${c.relVol.toFixed(2)}x</small></div><span class="pill ${c.color}">${c.score}</span></div>`).join(""):`<div class="notice">Noch kein Scan.</div>`}
 function renderPulse(){if(!state.scans.length){pulse.innerHTML="Noch keine Daten.";return}let btc=state.scans.find(c=>c.id==="bitcoin"),buy=state.scans.filter(c=>c.score>=80).length,avg=state.scans.slice(0,50).reduce((a,c)=>a+c.score,0)/Math.min(50,state.scans.length);pulse.innerHTML=`BTC 24h: <b class="${(btc?.ch24||0)>=0?'goodText':'badText'}">${pct(btc?.ch24||0)}</b><br>Top50 Score: <b>${avg.toFixed(0)}/100</b><br>Grüne Kandidaten: <b>${buy}</b>`}
-function renderResults(){if(!results)return;if(!state.scans.length){results.innerHTML=`<div class="card"><div class="notice">Noch keine Daten.</div></div>`;return}let list=[...state.scans];if(mode==="buy")list=list.filter(c=>c.score>=80);if(mode==="watch")list=list.filter(c=>c.score>=65&&c.score<80);if(mode==="risk")list=list.filter(c=>c.score>=50&&c.score<65);if(mode==="fixed")list=list.filter(c=>FIXED.includes(c.id));if(mode==="all")list=list.slice(0,25);results.innerHTML=list.length?list.map(card).join(""):`<div class="card"><div class="notice">Keine Treffer.</div></div>`}
+function renderResults(){if(!results)return;if(!state.scans.length){results.innerHTML=`<div class="card"><div class="notice">Noch keine Daten.</div></div>`;return}let list=[...state.scans];if(mode==="buy")list=list.filter(c=>c.score>=80);if(mode==="watch")list=list.filter(c=>c.score>=65&&c.score<80);if(mode==="risk")list=list.filter(c=>c.score>=50&&c.score<65);if(mode==="fixed")list=list.filter(c=>FIXED.includes(c.id));if(mode==="all")list=list.slice(0,50);results.innerHTML=list.length?list.map(card).join(""):`<div class="card"><div class="notice">Keine Treffer.</div></div>`}
 function renderPositions(){if(!positions)return;if(!state.positions.length){positions.innerHTML="Keine offenen Positionen.";return}positions.innerHTML=state.positions.map((p,i)=>{let last=p.lastPrice||p.entry,val=p.qty*last,pl=val-p.amount,pp=(last/p.entry-1)*100;return `<div class="history"><b>${p.symbol}</b><br>Entry: ${eur(p.entry)} · Aktuell: ${eur(last)}<br>Einsatz: ${eur(p.amount)} · Wert: ${eur(val)}<br>P/L: <span class="${pl>=0?'goodText':'badText'}">${eur(pl)} (${pct(pp)})</span><br>Stop: ${eur(p.stop)} · Ziel: ${eur(p.target)}<div class="actions"><button class="danger" onclick="sellAt(${i})">Verkaufen</button></div></div>`}).join("")}
 function renderHistory(){if(!history)return;history.innerHTML=state.history.length?state.history.slice().reverse().map(h=>`<div class="history"><b>${h.type} ${h.symbol}</b><br><small>${new Date(h.date).toLocaleString("de-DE")}</small><br>Entry: ${h.entry?eur(h.entry):"-"} ${h.exit?"· Exit: "+eur(h.exit):""} · Einsatz: ${eur(h.amount)}${h.pl!==undefined?`<br><span class="${h.pl>=0?'goodText':'badText'}">P/L: ${eur(h.pl)}</span>`:""}<br><span class="muted">${h.note||""}</span></div>`).join(""):"<small>Noch keine Trades.</small>"}
 function draw(){let c=document.getElementById("chart");if(!c)return;let ctx=c.getContext("2d"),r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;ctx.scale(d,d);ctx.clearRect(0,0,r.width,r.height);let vals=state.equity.map(x=>x.value),min=Math.min(...vals,95),max=Math.max(...vals,105),pad=18;ctx.strokeStyle="#27344d";for(let i=0;i<4;i++){let y=pad+i*(r.height-pad*2)/3;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(r.width-pad,y);ctx.stroke()}ctx.strokeStyle="#4a7dff";ctx.lineWidth=3;ctx.beginPath();vals.forEach((v,i)=>{let x=pad+(i/Math.max(vals.length-1,1))*(r.width-pad*2),y=r.height-pad-((v-min)/(max-min||1))*(r.height-pad*2);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke()}
