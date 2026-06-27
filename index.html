@@ -34,7 +34,7 @@
 <section id="roadmap" class="section">
   <div class="card"><h2>Entwicklungsstand</h2>
     <div class="stats">
-      <div class="stat"><div class="label">Version</div><div class="value">V5.1</div></div>
+      <div class="stat"><div class="label">Version</div><div class="value">V5.2</div></div>
       <div class="stat"><div class="label">Fortschritt</div><div class="value" id="devProgress">0 %</div></div>
       <div class="stat"><div class="label">Funktionen fertig</div><div class="value" id="doneCount">0/0</div></div>
       <div class="stat"><div class="label">Paper-Trades</div><div class="value" id="tradeCount">0</div></div>
@@ -57,6 +57,148 @@
     <div class="card"><h2>🚧 In Arbeit</h2><div id="workList" class="checklist"></div></div>
   </div>
   <div class="card"><h2>📅 Geplant</h2><div id="plannedList" class="checklist"></div></div>
+
+  <div class="card">
+    <h2>📘 Trading-Engine V5 – Dokumentation</h2>
+    <p>Diese Übersicht erklärt, wie Crypto Scout Coins bewertet, welche Daten verwendet werden und warum eine Kaufentscheidung zustande kommt.</p>
+  </div>
+
+  <div class="card">
+    <h2>1. Datenquelle</h2>
+    <div class="notice">
+      <b>Quelle:</b> CoinGecko API<br><br>
+      Abgerufen werden je nach Scan-Einstellung die Top 50, 100, 150 oder 250 Kryptowährungen.
+      Zusätzlich werden unsere Kern-Coins geladen: Bitcoin, Solana, Hyperliquid, Bittensor und Ondo.
+    </div>
+    <br>
+    <div class="metrics">
+      <div class="metric"><span class="label">Kursdaten</span><b>EUR Live-Kurs</b></div>
+      <div class="metric"><span class="label">Zeiträume</span><b>1h / 24h / 7d / 30d</b></div>
+      <div class="metric"><span class="label">Liquidität</span><b>24h Volumen</b></div>
+      <div class="metric"><span class="label">Größe</span><b>Market Cap</b></div>
+      <div class="metric"><span class="label">Benchmark</span><b>Bitcoin</b></div>
+      <div class="metric"><span class="label">Eigene Daten</span><b>Paper-Trades</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Eigene Berechnungen</h2>
+    <div class="checklist">
+      <div class="check"><b>Relatives Volumen:</b> Handelsvolumen im Verhältnis zur Market Cap, verglichen mit dem Marktmedian.</div>
+      <div class="check"><b>Stärke gegenüber Bitcoin:</b> 24h-Performance des Coins minus 24h-Performance von Bitcoin.</div>
+      <div class="check"><b>Marktphase:</b> bullisch, neutral oder bärisch anhand von BTC und Top-50-Marktbewegung.</div>
+      <div class="check"><b>Chance/Risiko:</b> Verhältnis von Take-Profit-Abstand zu Stop-Loss-Abstand.</div>
+      <div class="check"><b>Dynamischer Stop-Loss:</b> wird aus der aktuellen Volatilität abgeleitet.</div>
+      <div class="check"><b>Dynamisches Take-Profit:</b> wird aus Stop-Abstand und Chance/Risiko berechnet.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3. Bewertungsmodell</h2>
+    <div class="columns">
+      <div class="notice">
+        <h3>Qualitäts-Score</h3>
+        Bewertet, ob der Coin grundsätzlich interessant ist.<br><br>
+        Faktoren:
+        <ul>
+          <li>7-Tage-Trend</li>
+          <li>30-Tage-Trend</li>
+          <li>Stärke gegenüber Bitcoin</li>
+          <li>Relatives Volumen</li>
+          <li>Liquidität</li>
+          <li>Market Cap</li>
+        </ul>
+      </div>
+      <div class="notice">
+        <h3>Entry-Score</h3>
+        Bewertet, ob jetzt ein sinnvoller Einstieg vorliegt.<br><br>
+        Faktoren:
+        <ul>
+          <li>BTC stabil oder positiv</li>
+          <li>Pullback-Zone 3–8 %</li>
+          <li>kurzfristige Bestätigung</li>
+          <li>nicht überhitzt</li>
+          <li>Chance/Risiko über 2</li>
+          <li>Marktphase</li>
+        </ul>
+      </div>
+    </div>
+    <br>
+    <div class="columns">
+      <div class="notice">
+        <h3>Risiko-Score</h3>
+        Zeigt, wie riskant ein Trade aktuell ist. Je niedriger, desto besser.<br><br>
+        Risiko steigt bei:
+        <ul>
+          <li>starker Überhitzung</li>
+          <li>geringer Liquidität</li>
+          <li>kleiner Market Cap</li>
+          <li>schwachem BTC-Markt</li>
+          <li>extremen Volumen-Spikes</li>
+        </ul>
+      </div>
+      <div class="notice">
+        <h3>Confidence</h3>
+        Gesamtvertrauen in das Signal.<br><br>
+        Berechnung:
+        <ul>
+          <li>35 % Qualität</li>
+          <li>45 % Entry</li>
+          <li>20 % niedriges Risiko</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>4. Kaufentscheidung</h2>
+    <div class="metrics">
+      <div class="metric"><span class="label">KAUFEN</span><b>Q ≥70 · E ≥75 · R ≤55 · C ≥70</b></div>
+      <div class="metric"><span class="label">BEOBACHTEN</span><b>gute Qualität, Einstieg noch nicht perfekt</b></div>
+      <div class="metric"><span class="label">WARTEN</span><b>Coin interessant, Timing schlecht</b></div>
+      <div class="metric"><span class="label">NICHT KAUFEN</span><b>Kernregel verletzt</b></div>
+    </div>
+    <br>
+    <div class="notice">
+      Wichtig: Ein hoher Qualitäts-Score allein ist kein Kaufsignal. Gekauft wird nur, wenn Qualität, Entry, Risiko und Confidence gemeinsam passen.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>5. Portfolio-Regeln</h2>
+    <div class="checklist">
+      <div class="check">Mehrere Positionen statt All-in.</div>
+      <div class="check">Korb-Kauf wird nach Confidence scoregewichtet.</div>
+      <div class="check">Bitcoin wird nicht automatisch im Korb gekauft.</div>
+      <div class="check">Bereits offene Positionen werden nicht doppelt gekauft.</div>
+      <div class="check">Die stärksten Kandidaten erhalten mehr Kapital, aber nicht automatisch alles.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>6. Positionsmanagement</h2>
+    <div class="metrics">
+      <div class="metric"><span class="label">HALTEN</span><b>kein klares Signal</b></div>
+      <div class="metric"><span class="label">STOP ANZIEHEN</span><b>Gewinn über 12 %</b></div>
+      <div class="metric"><span class="label">TEILGEWINN</span><b>Take-Profit erreicht</b></div>
+      <div class="metric"><span class="label">VERKAUF PRÜFEN</span><b>Stop-Loss erreicht</b></div>
+      <div class="metric"><span class="label">RISIKO REDUZIEREN</span><b>Verlust größer 10 %</b></div>
+      <div class="metric"><span class="label">AUTO-WÄCHTER</span><b>nur solange App offen ist</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>7. Versionshistorie</h2>
+    <div class="checklist">
+      <div class="check"><b>V1:</b> einfache Watchlist und manuelle Paper-Trades.</div>
+      <div class="check"><b>V2:</b> automatische CoinGecko-Kursdaten.</div>
+      <div class="check"><b>V3:</b> Markt-Scanner mit Score und Kaufkandidaten.</div>
+      <div class="check"><b>V4:</b> mehrere Positionen, Korb-Kauf und Depotansicht.</div>
+      <div class="check"><b>V5:</b> Trading Engine mit Qualität, Entry, Risiko und Confidence.</div>
+      <div class="check"><b>V5.1:</b> Roadmap, Strategie-Kennzahlen und Dokumentation.</div>
+      <div class="check"><b>V6 geplant:</b> technische Indikatoren, Backtesting, Lernfunktion und echte Pushs.</div>
+    </div>
+  </div>
 </section>
 </div>
 
