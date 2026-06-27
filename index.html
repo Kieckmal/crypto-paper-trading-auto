@@ -3,287 +3,68 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Crypto Scout V4</title>
+<title>Crypto Scout V5</title>
 <style>
 :root{--bg:#070910;--card:#111827;--card2:#172033;--soft:#0b101b;--line:#27344d;--text:#f6f8fc;--muted:#98a6ba;--green:#22d17d;--red:#ff5d70;--yellow:#f5c542;--orange:#ff9f43;--blue:#4a7dff}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,rgba(74,125,255,.2),transparent 35%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:16px 14px 40px}.app{max-width:1100px;margin:auto;display:grid;gap:12px}h1{font-size:25px;margin:4px 0 2px}h2{font-size:18px;margin:0 0 12px}small,p,.muted{color:var(--muted)}.top{display:flex;justify-content:space-between;gap:10px}.badge{font-size:12px;background:rgba(74,125,255,.18);border:1px solid rgba(74,125,255,.35);padding:6px 10px;border-radius:999px}.card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015)),var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 16px 40px rgba(0,0,0,.28)}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:var(--soft);border:1px solid var(--line);border-radius:17px;padding:12px}.label{font-size:12px;color:var(--muted)}.value{font-size:22px;font-weight:950;margin-top:5px}button,input,select,textarea{font:inherit}button{border:0;border-radius:15px;padding:13px 14px;background:linear-gradient(135deg,var(--blue),#3158d4);color:white;font-weight:900}button.good{background:linear-gradient(135deg,#20b86f,#147a4a)}button.danger{background:linear-gradient(135deg,#d44758,#922835)}button.secondary{background:#30394d}input,select,textarea{width:100%;padding:12px;border-radius:15px;border:1px solid var(--line);background:#0b1019;color:var(--text);font-size:16px}textarea{min-height:78px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{flex:1;min-width:110px}.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;position:sticky;top:8px;z-index:20;background:rgba(7,9,16,.86);backdrop-filter:blur(12px);padding:6px;border-radius:999px;border:1px solid rgba(39,52,77,.7)}.tab{padding:11px 6px;border-radius:999px;background:#202a3c;border:1px solid var(--line);color:#d9e2ef;font-size:13px}.tab.active{background:var(--blue)}.section{display:none}.section.active{display:grid;gap:12px}.coin{background:var(--card2);border:1px solid var(--line);border-radius:20px;padding:13px;margin-bottom:10px;display:grid;gap:10px}.head{display:flex;justify-content:space-between;gap:10px}.name{font-weight:950;font-size:18px}.score{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);font-weight:950;background:conic-gradient(var(--green) calc(var(--s)*1%),#29344a 0)}.score.yellow{background:conic-gradient(var(--yellow) calc(var(--s)*1%),#29344a 0)}.score.orange{background:conic-gradient(var(--orange) calc(var(--s)*1%),#29344a 0)}.score.red{background:conic-gradient(var(--red) calc(var(--s)*1%),#29344a 0)}.pill{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:850;border:1px solid var(--line);background:#202a3c}.pill.green{color:var(--green)}.pill.yellow{color:var(--yellow)}.pill.orange{color:var(--orange)}.pill.red{color:var(--red)}.metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.metric{background:#0b111c;border:1px solid var(--line);border-radius:14px;padding:9px}.metric b{display:block;font-size:14px;margin-top:3px}.goodText{color:var(--green)}.badText{color:var(--red)}.warnText{color:var(--yellow)}.notice{background:#0c1422;border:1px solid #22324e;border-radius:17px;padding:12px;color:#d5dfef}.history{border-top:1px solid var(--line);padding:11px 0}.history:first-child{border-top:0}.loader{display:none;color:var(--muted)}.loader.active{display:block}.chart{height:160px;width:100%;background:#0b111c;border:1px solid var(--line);border-radius:17px}.smallBtns{display:flex;gap:6px;flex-wrap:wrap}.smallBtns button{font-size:12px;padding:8px 9px;border-radius:999px;flex:0 0 auto;background:#29344a}.rank{display:grid;gap:8px}.rankItem{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;background:#0b111c;border:1px solid var(--line);border-radius:15px;padding:10px}.rankNo{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#202a3c;font-weight:900}@media(min-width:760px){.stats{grid-template-columns:repeat(4,1fr)}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tabs{position:sticky}}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,rgba(74,125,255,.20),transparent 34%),radial-gradient(circle at 100% 0,rgba(34,209,125,.12),transparent 30%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:16px 14px 40px}.app{max-width:1120px;margin:auto;display:grid;gap:12px}h1{font-size:25px;margin:4px 0 2px;letter-spacing:-.5px}h2{font-size:18px;margin:0 0 12px}small,p,.muted{color:var(--muted)}button,input,select,textarea{font:inherit}.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.badge{font-size:12px;background:rgba(74,125,255,.18);border:1px solid rgba(74,125,255,.35);padding:6px 10px;border-radius:999px;white-space:nowrap}.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;position:sticky;top:8px;z-index:20;background:rgba(7,9,16,.86);backdrop-filter:blur(12px);padding:6px;border-radius:999px;border:1px solid rgba(39,52,77,.7)}.tab{padding:10px 4px;border-radius:999px;background:#202a3c;border:1px solid var(--line);color:#d9e2ef;font-size:12px}.tab.active{background:var(--blue);color:#fff}.section{display:none}.section.active{display:grid;gap:12px}.card{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015)),var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 16px 40px rgba(0,0,0,.28)}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:var(--soft);border:1px solid var(--line);border-radius:17px;padding:12px}.label{font-size:12px;color:var(--muted)}.value{font-size:22px;font-weight:950;margin-top:5px}button{border:0;border-radius:15px;padding:13px 14px;background:linear-gradient(135deg,var(--blue),#3158d4);color:#fff;font-weight:900;cursor:pointer}button.good{background:linear-gradient(135deg,#20b86f,#147a4a)}button.danger{background:linear-gradient(135deg,#d44758,#922835)}button.secondary{background:#30394d}input,select,textarea{width:100%;padding:12px;border-radius:15px;border:1px solid var(--line);background:#0b1019;color:var(--text);font-size:16px}textarea{min-height:78px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{flex:1;min-width:110px}.coin{background:var(--card2);border:1px solid var(--line);border-radius:20px;padding:13px;margin-bottom:10px;display:grid;gap:10px}.head{display:flex;justify-content:space-between;gap:10px}.name{font-weight:950;font-size:18px}.sub{font-size:12px;color:var(--muted)}.score{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);font-weight:950;background:conic-gradient(var(--green) calc(var(--s)*1%),#29344a 0)}.score.yellow{background:conic-gradient(var(--yellow) calc(var(--s)*1%),#29344a 0)}.score.orange{background:conic-gradient(var(--orange) calc(var(--s)*1%),#29344a 0)}.score.red{background:conic-gradient(var(--red) calc(var(--s)*1%),#29344a 0)}.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:850;border:1px solid var(--line);background:#202a3c}.pill.green{color:var(--green)}.pill.yellow{color:var(--yellow)}.pill.orange{color:var(--orange)}.pill.red{color:var(--red)}.metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.metric{background:#0b111c;border:1px solid var(--line);border-radius:14px;padding:9px;min-width:0}.metric b{display:block;font-size:14px;margin-top:3px;overflow:hidden;text-overflow:ellipsis}.goodText{color:var(--green)}.badText{color:var(--red)}.warnText{color:var(--yellow)}.notice{background:#0c1422;border:1px solid #22324e;border-radius:17px;padding:12px;color:#d5dfef}.history{border-top:1px solid var(--line);padding:11px 0}.history:first-child{border-top:0}.loader{display:none;color:var(--muted)}.loader.active{display:block}.chart{height:160px;width:100%;background:#0b111c;border:1px solid var(--line);border-radius:17px}.smallBtns{display:flex;gap:6px;flex-wrap:wrap}.smallBtns button{font-size:12px;padding:8px 9px;border-radius:999px;flex:0 0 auto;background:#29344a}.rank{display:grid;gap:8px}.rankItem{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;background:#0b111c;border:1px solid var(--line);border-radius:15px;padding:10px}.rankNo{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#202a3c;font-weight:900}.reasonGrid{display:grid;gap:6px}.reason{display:flex;gap:7px;align-items:flex-start;font-size:13px}.columns{display:grid;gap:10px}@media(min-width:760px){.stats{grid-template-columns:repeat(4,1fr)}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.columns{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <div class="app">
- <div class="top"><div><h1>Crypto Scout V4</h1><small>Mehrere Positionen · Korb-Kauf · Kapitalaufteilung</small></div><span class="badge" id="status">Bereit</span></div>
- <nav class="tabs"><button class="tab active" onclick="tab('home',this)">Home</button><button class="tab" onclick="tab('scanner',this)">Scanner</button><button class="tab" onclick="tab('trade',this)">Trade</button><button class="tab" onclick="tab('journal',this)">Journal</button></nav>
+<div class="top"><div><h1>Crypto Scout V5</h1><small>Trading Engine · Qualität · Einstieg · Risiko · Confidence</small></div><span class="badge" id="status">Bereit</span></div>
+<nav class="tabs"><button class="tab active" onclick="tab('home',this)">Depot</button><button class="tab" onclick="tab('scanner',this)">Scanner</button><button class="tab" onclick="tab('trade',this)">Trade</button><button class="tab" onclick="tab('manage',this)">Manager</button><button class="tab" onclick="tab('journal',this)">Journal</button></nav>
 
- <section id="home" class="section active">
-  <div class="card"><h2>Dashboard</h2><div class="stats">
-   <div class="stat"><div class="label">Cash</div><div class="value" id="cash">100 €</div></div>
-   <div class="stat"><div class="label">Depotwert</div><div class="value" id="equity">100 €</div></div>
-   <div class="stat"><div class="label">Offene Positionen</div><div class="value" id="posCount">0</div></div>
-   <div class="stat"><div class="label">Gesamt P/L</div><div class="value" id="pl">0 €</div></div>
-  </div><div class="actions"><button onclick="scan()">Markt scannen</button><button class="secondary" onclick="refreshPositions()">Positionen aktualisieren</button></div><p class="loader" id="loader">Lade Daten...</p><small id="lastScan">Noch kein Scan.</small></div>
-  <div class="card"><h2>Auto-Wächter</h2><p>Scannt automatisch, solange die App offen ist. Benachrichtigung bei Stop-Loss, Take-Profit oder starkem Positionsverlust.</p>
-    <div class="row"><select id="autoMinutes"><option value="15">alle 15 Minuten</option><option value="30" selected>alle 30 Minuten</option><option value="60">alle 60 Minuten</option></select><button class="secondary" onclick="requestNotifications()">Benachrichtigungen erlauben</button></div>
-    <div class="actions"><button class="good" onclick="startAutoWatch()">Auto-Wächter starten</button><button class="danger" onclick="stopAutoWatch()">Stoppen</button></div>
-    <small id="autoStatus">Auto-Wächter aus.</small>
-    <div id="alertLog" class="notice" style="margin-top:10px">Noch keine Warnungen.</div>
-  </div>
-  <div class="card"><h2>Offene Positionen</h2><div id="homePositions" class="notice">Keine offenen Positionen.</div></div>
-  <div class="two"><div class="card"><h2>Depotverlauf</h2><canvas id="chart" class="chart"></canvas></div><div class="card"><h2>Marktstatus</h2><div id="pulse" class="notice">Noch keine Daten.</div></div></div>
- </section>
+<section id="home" class="section active">
+<div class="card"><h2>Depot</h2><div class="stats"><div class="stat"><div class="label">Cash</div><div class="value" id="cash">100 €</div></div><div class="stat"><div class="label">Depotwert</div><div class="value" id="equity">100 €</div></div><div class="stat"><div class="label">Offene Positionen</div><div class="value" id="posCount">0</div></div><div class="stat"><div class="label">Gesamt P/L</div><div class="value" id="pl">0 €</div></div></div><div class="actions"><button onclick="scan()">Markt scannen</button><button class="secondary" onclick="refreshPositions()">Positionen aktualisieren</button></div><p class="loader" id="loader">Lade Daten...</p><small id="lastScan">Noch kein Scan.</small></div>
+<div class="card"><h2>Offene Positionen</h2><div id="homePositions" class="notice">Keine offenen Positionen.</div></div>
+<div class="two"><div class="card"><h2>Depotverlauf</h2><canvas id="chart" class="chart"></canvas></div><div class="card"><h2>Marktphase</h2><div id="pulse" class="notice">Noch keine Daten.</div></div></div>
+</section>
 
- <section id="scanner" class="section">
-  <div class="card"><h2>Scanner</h2><p>Die Ansicht zeigt eine breite Rangliste. Grün-Korb kauft ausschließlich Coins mit Score ≥80. Breiter Korb kauft Kandidaten ab Score ≥65.</p>
-   <div class="row"><select id="scanSize"><option value="50">Top 50</option><option value="100" selected>Top 100</option><option value="150">Top 150</option><option value="250">Top 250</option></select><button onclick="scan()">Scannen</button></div><br>
-   <div class="row"><input id="basketAmount" type="number" step="1" placeholder="Betrag für Korb, leer = gesamtes Cash"><select id="basketCount"><option value="5">Top 5 kaufen</option><option value="8" selected>Top 8 kaufen</option><option value="10">Top 10 kaufen</option><option value="15">Top 15 kaufen</option></select></div><br>
-   <div class="row"><button class="good" onclick="buyGreenWeighted()">Grün scoregewichtet</button><button class="secondary" onclick="buyGreenEqual()">Grün gleich verteilt</button></div><br>
-   <div class="row"><button class="secondary" onclick="buyBroadWeighted()">Breiter Korb ≥65</button><button class="secondary" onclick="buyVisibleWeighted()">Aktuelle Ansicht kaufen</button></div><br>
-   <div class="smallBtns"><button onclick="mode='all';render()">Top 50</button><button onclick="mode='buy';render()">Grün ≥80</button><button onclick="mode='watch';render()">Gelb 65–79</button><button onclick="mode='risk';render()">High Risk 50–64</button><button onclick="mode='fixed';render()">Unsere 5</button></div>
-  </div><div id="results"></div>
- </section>
+<section id="scanner" class="section">
+<div class="card"><h2>Scanner</h2><p>Qualität zeigt, ob der Coin interessant ist. Einstieg zeigt, ob jetzt gekauft werden sollte. Nur „Kaufen“ ist ein echter Einstiegskandidat.</p><div class="row"><select id="scanSize"><option value="50">Top 50</option><option value="100" selected>Top 100</option><option value="150">Top 150</option><option value="250">Top 250</option></select><button onclick="scan()">Scannen</button></div><br><div class="row"><input id="basketAmount" type="number" step="1" placeholder="Betrag für Korb, leer = gesamtes Cash"><select id="basketCount"><option value="3">Top 3</option><option value="5" selected>Top 5</option><option value="8">Top 8</option><option value="10">Top 10</option></select></div><br><div class="row"><button class="good" onclick="buyEntryBasket()">Nur Kaufen scoregewichtet</button><button class="secondary" onclick="buyWatchBasket()">Kaufen+Beobachten ab 70</button></div><br><div class="smallBtns"><button onclick="mode='entry';render()">Kaufen</button><button onclick="mode='watch';render()">Beobachten</button><button onclick="mode='wait';render()">Warten</button><button onclick="mode='all';render()">Top 50</button><button onclick="mode='fixed';render()">Unsere 5</button></div></div>
+<div class="card"><h2>Top Einstiegskandidaten</h2><div id="topEntries" class="rank"><div class="notice">Noch kein Scan.</div></div></div><div id="results"></div>
+</section>
 
- <section id="trade" class="section">
-  <div class="card"><h2>Trade vorbereiten</h2>
-   <div class="row3"><input id="tradeId" placeholder="Coin ID"><input id="tradeSymbol" placeholder="Symbol"><input id="tradePrice" type="number" step="0.00000001" placeholder="Kurs €"></div><br>
-   <div class="row3"><input id="tradeAmount" type="number" step="1" placeholder="Einsatz €"><input id="stopLoss" type="number" step="0.00000001" placeholder="Stop"><input id="takeProfit" type="number" step="0.00000001" placeholder="Ziel"></div><br>
-   <textarea id="tradeNote" placeholder="Warum kaufen?"></textarea><div class="actions"><button class="good" onclick="buyOne()">Virtuell kaufen</button><button class="secondary" onclick="document.getElementById('tradeAmount').value=state.cash.toFixed(2)">Max Cash</button></div>
-  </div>
-  <div class="card"><h2>Offene Positionen</h2><div id="positions" class="notice">Keine offenen Positionen.</div></div>
- </section>
+<section id="trade" class="section"><div class="card"><h2>Trade vorbereiten</h2><div class="row3"><input id="tradeId" placeholder="Coin ID"><input id="tradeSymbol" placeholder="Symbol"><input id="tradePrice" type="number" step="0.00000001" placeholder="Kurs €"></div><br><div class="row3"><input id="tradeAmount" type="number" step="1" placeholder="Einsatz €"><input id="stopLoss" type="number" step="0.00000001" placeholder="Stop"><input id="takeProfit" type="number" step="0.00000001" placeholder="Ziel"></div><br><textarea id="tradeNote" placeholder="Warum kaufen?"></textarea><div class="actions"><button class="good" onclick="buyOne()">Virtuell kaufen</button><button class="secondary" onclick="document.getElementById('tradeAmount').value=state.cash.toFixed(2)">Max Cash</button></div></div></section>
 
- <section id="journal" class="section">
-  <div class="card"><h2>Journal & Daten</h2><div class="actions"><button class="secondary" onclick="exportData()">Export JSON</button><button class="danger" onclick="resetAll()">Reset</button></div></div>
-  <div class="card"><h2>Trade-Historie</h2><div id="history"></div></div>
- </section>
+<section id="manage" class="section"><div class="card"><h2>Positions-Manager</h2><p>Management-Score gibt Hinweise für Halten, Stop anziehen, Teilgewinn oder Verkauf prüfen.</p><div class="actions"><button onclick="refreshPositions()">Positionen aktualisieren</button><button class="secondary" onclick="requestNotifications()">Benachrichtigungen erlauben</button></div></div><div class="card"><h2>Offene Positionen</h2><div id="positions" class="notice">Keine offenen Positionen.</div></div><div class="card"><h2>Auto-Wächter</h2><div class="row"><select id="autoMinutes"><option value="15">alle 15 Minuten</option><option value="30" selected>alle 30 Minuten</option><option value="60">alle 60 Minuten</option></select><button class="good" onclick="startAutoWatch()">Starten</button></div><div class="actions"><button class="danger" onclick="stopAutoWatch()">Stoppen</button></div><small id="autoStatus">Auto-Wächter aus. App muss offen bleiben.</small><div id="alertLog" class="notice" style="margin-top:10px">Noch keine Warnungen.</div></div></section>
 
- 
+<section id="journal" class="section"><div class="card"><h2>Journal & Daten</h2><div class="actions"><button class="secondary" onclick="exportData()">Export JSON</button><button class="danger" onclick="resetAll()">Reset</button></div></div><div class="card"><h2>Trade-Historie</h2><div id="history"></div></div></section>
 </div>
 
 <script>
-const API="https://api.coingecko.com/api/v3";
-const KEY="cryptoScoutV4";
-const FIXED=["bitcoin","solana","hyperliquid","bittensor","ondo-finance"];
-let mode="all";
-let state=JSON.parse(localStorage.getItem(KEY))||{cash:100,start:100,positions:[],scans:[],history:[],equity:[{date:new Date().toISOString(),value:100}],lastScan:"",alerts:[]};
-let autoTimer=null;
-if(!Array.isArray(state.positions)){state.positions=state.position?[state.position]:[];delete state.position}
-if(!Array.isArray(state.alerts))state.alerts=[]
-function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
-function eur(n){let x=Number(n)||0;if(Math.abs(x)<.01&&x!==0)return x.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:8})+" €";return x.toLocaleString("de-DE",{style:"currency",currency:"EUR"})}
-function pct(n){return (Number(n)||0).toFixed(2)+"%"}
-function compact(n){n=Number(n)||0;if(n>=1e9)return(n/1e9).toFixed(2)+" Mrd.";if(n>=1e6)return(n/1e6).toFixed(1)+" Mio.";if(n>=1e3)return(n/1e3).toFixed(1)+" Tsd.";return n.toFixed(0)}
-function tab(id,b){document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");render()}
-function status(t){document.getElementById("status").textContent=t}
-function load(on){document.getElementById("loader").classList.toggle("active",!!on)}
+const API="https://api.coingecko.com/api/v3",KEY="cryptoScoutV5",FIXED=["bitcoin","solana","hyperliquid","bittensor","ondo-finance"];let mode="entry",autoTimer=null;let state=JSON.parse(localStorage.getItem(KEY))||{cash:100,start:100,positions:[],scans:[],history:[],equity:[{date:new Date().toISOString(),value:100}],lastScan:"",alerts:[]};if(!Array.isArray(state.positions)){state.positions=state.position?[state.position]:[];delete state.position}if(!Array.isArray(state.alerts))state.alerts=[];
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}function eur(n){let x=Number(n)||0;if(Math.abs(x)<.01&&x!==0)return x.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:8})+" €";return x.toLocaleString("de-DE",{style:"currency",currency:"EUR"})}function pct(n){return(Number(n)||0).toFixed(2)+"%"}function clamp(n,a,b){return Math.max(a,Math.min(b,n))}function median(a){a=a.filter(x=>isFinite(x)).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:0}function tab(id,b){document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");render()}function status(t){document.getElementById("status").textContent=t}function load(on){document.getElementById("loader").classList.toggle("active",!!on)}
 async function markets(ids=null,per=100){let u=ids?`${API}/coins/markets?vs_currency=eur&ids=${encodeURIComponent(ids.join(","))}&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=1h,24h,7d,30d`:`${API}/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=${per}&page=1&sparkline=false&price_change_percentage=1h,24h,7d,30d`;let r=await fetch(u);if(!r.ok)throw new Error("CoinGecko Fehler / Rate Limit");return await r.json()}
-function median(a){a=a.filter(x=>isFinite(x)).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:0}
-function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
-function score(c,btc,medTurn){
- const ch1=c.price_change_percentage_1h_in_currency||0,ch24=c.price_change_percentage_24h_in_currency??c.price_change_percentage_24h??0,ch7=c.price_change_percentage_7d_in_currency||0,ch30=c.price_change_percentage_30d_in_currency||0;
- const btc24=btc?(btc.price_change_percentage_24h_in_currency??btc.price_change_percentage_24h??0):0,rel=ch24-btc24,vol=c.total_volume||0,mcap=c.market_cap||0,turn=mcap?vol/mcap:0,relVol=medTurn?turn/medTurn:1;
- let s=0,reasons=[];
- let add=(v,t)=>{s+=v;reasons.push(t)}
- if(ch24>8)add(22,["✅","starkes 24h-Momentum"]);else if(ch24>3)add(15,["✅","24h positiv"]);else if(ch24>0)add(7,["➕","leicht positiv"]);else add(-8,["❌","24h negativ"]);
- if(ch1>1.5)add(10,["✅","1h-Schub"]);else if(ch1<-1.5)add(-7,["❌","1h schwach"]);
- if(ch7>15)add(13,["✅","7d Trend stark"]);else if(ch7>5)add(8,["✅","7d Trend positiv"]);else if(ch7<-10)add(-8,["⚠️","7d schwach"]);
- if(rel>5)add(15,["✅","stärker als BTC"]);else if(rel>0)add(7,["➕","leicht stärker als BTC"]);else add(-5,["❌","schwächer als BTC"]);
- if(relVol>2)add(18,["✅","relatives Volumen stark"]);else if(relVol>1.2)add(10,["✅","Volumen über Markt"]);else add(0,["➖","Volumen normal"]);
- if(vol>50000000)add(8,["✅","Liquidität gut"]);else if(vol<5000000)add(-10,["⚠️","dünne Liquidität"]);
- if(mcap>100000000)add(6,["✅","Market Cap ok"]);else add(-6,["⚠️","sehr klein"]);
- if(ch24>25||ch7>60)add(-8,["⚠️","möglich überhitzt"]);
- s=clamp(Math.round(s+25),0,100);
- let color="red",verdict="FINGER WEG";if(s>=80){color="green";verdict="KAUFKANDIDAT"}else if(s>=65){color="yellow";verdict="BEOBACHTEN"}else if(s>=50){color="orange";verdict="HIGH RISK"}
- let volat=Math.max(Math.abs(ch24),Math.abs(ch7)/3,5),stopPct=clamp(volat*.9,7,16),targetPct=clamp(stopPct*2,14,35);
- return {...c,ch1,ch24,ch7,ch30,rel,relVol,score:s,color,verdict,reasons,stop:c.current_price*(1-stopPct/100),target:c.current_price*(1+targetPct/100),stopPct,targetPct}
-}
-async function scan(){try{load(true);status("Scan läuft");let per=Number(document.getElementById("scanSize").value||100);let [top,fixed]=await Promise.all([markets(null,per),markets(FIXED,250)]);let map=new Map();[...top,...fixed].forEach(c=>map.set(c.id,c));let all=[...map.values()],btc=all.find(c=>c.id==="bitcoin");let med=median(all.map(c=>c.market_cap?c.total_volume/c.market_cap:0).filter(x=>x>0));state.scans=all.map(c=>score(c,btc,med)).sort((a,b)=>b.score-a.score);state.lastScan="Letzter Scan: "+new Date().toLocaleString("de-DE");pushEquity();save();checkSellSignals();status("Scan fertig")}catch(e){alert(e.message);status("Fehler")}finally{load(false)}}
-function equity(){return state.cash+state.positions.reduce((a,p)=>a+p.qty*(p.lastPrice||p.entry),0)}
-function pushEquity(){let v=equity(),l=state.equity.at(-1);if(!l||Math.abs(l.value-v)>.001){state.equity.push({date:new Date().toISOString(),value:v});if(state.equity.length>160)state.equity=state.equity.slice(-160)}}
-function prepare(c){document.getElementById("tradeId").value=c.id;document.getElementById("tradeSymbol").value=c.symbol.toUpperCase();document.getElementById("tradePrice").value=c.current_price;document.getElementById("tradeAmount").value=Math.min(state.cash,100).toFixed(2);document.getElementById("stopLoss").value=c.stop.toFixed(8);document.getElementById("takeProfit").value=c.target.toFixed(8);document.getElementById("tradeNote").value=`Score ${c.score}/100. ${c.verdict}.`;document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById("trade").classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab")[2].classList.add("active");render()}
+function marketPhase(all,btc){let btc24=btc?(btc.price_change_percentage_24h_in_currency??btc.price_change_percentage_24h??0):0,avg=all.slice(0,50).reduce((a,c)=>a+(c.price_change_percentage_24h_in_currency??c.price_change_percentage_24h??0),0)/Math.min(50,all.length);if(btc24>1.5&&avg>1)return"bull";if(btc24<-2||avg<-2)return"bear";return"neutral"}
+function evaluate(c,btc,med,phase){let ch1=c.price_change_percentage_1h_in_currency||0,ch24=c.price_change_percentage_24h_in_currency??c.price_change_percentage_24h??0,ch7=c.price_change_percentage_7d_in_currency||0,ch30=c.price_change_percentage_30d_in_currency||0,btc24=btc?(btc.price_change_percentage_24h_in_currency??btc.price_change_percentage_24h??0):0,rel=ch24-btc24,vol=c.total_volume||0,mcap=c.market_cap||0,turn=mcap?vol/mcap:0,relVol=med?turn/med:1,pos=[],neg=[],q=35,e=25,risk=0;
+if(ch7>15){q+=18;pos.push(["✅","7-Tage-Trend stark"])}else if(ch7>5){q+=11;pos.push(["✅","7-Tage-Trend positiv"])}else if(ch7<-10){q-=8;neg.push(["❌","7-Tage-Trend schwach"])}
+if(rel>5){q+=18;pos.push(["✅","stärker als Bitcoin"])}else if(rel>0){q+=9;pos.push(["➕","leicht stärker als BTC"])}else{q-=7;neg.push(["❌","schwächer als BTC"])}
+if(relVol>2){q+=18;pos.push(["✅","relatives Volumen stark"])}else if(relVol>1.2){q+=10;pos.push(["✅","Volumen über Markt"])}else neg.push(["➖","relatives Volumen unauffällig"]);
+if(vol>50000000){q+=12;pos.push(["✅","Liquidität gut"])}else if(vol<5000000){q-=12;risk+=20;neg.push(["⚠️","zu wenig Liquidität"])}
+if(mcap>100000000){q+=10;pos.push(["✅","Market Cap ausreichend"])}else{q-=8;risk+=18;neg.push(["⚠️","sehr kleine Market Cap"])}
+if(ch30>0){q+=8;pos.push(["✅","30-Tage-Trend positiv"])}else if(ch30<-25){q-=10;risk+=10;neg.push(["⚠️","30-Tage-Trend stark negativ"])}
+if(btc24>-1.5){e+=15;pos.push(["✅","BTC stabil genug"])}else{e-=18;risk+=15;neg.push(["❌","BTC schwach"])}
+if(ch24>=-8&&ch24<=-3){e+=22;pos.push(["✅","Pullback-Zone 3–8 %"])}else if(ch24>0&&ch24<=8){e+=15;pos.push(["✅","Momentum ohne Überhitzung"])}else if(ch24>15){e-=20;risk+=22;neg.push(["❌","24h überhitzt"])}else if(ch24<-12){e-=12;neg.push(["❌","starker Tagesverlust"])}
+if(ch1>0&&ch1<3){e+=12;pos.push(["✅","kurzfristige Bestätigung"])}else if(ch1<-2){e-=10;neg.push(["❌","kurzfristig schwach"])}
+if(ch7>5&&ch7<40){e+=12}else if(ch7>45){e-=14;risk+=18;neg.push(["❌","7d überdehnt"])}
+if(rel>0)e+=12;else e-=6;if(relVol>1.2&&relVol<5)e+=12;else if(relVol>6){e-=6;risk+=12;neg.push(["⚠️","Volumen-Spike kann Exhaustion sein"])}
+if(phase==="bear"){e-=15;neg.push(["❌","Marktphase bärisch"])}else if(phase==="bull"){e+=8;pos.push(["✅","Marktphase unterstützt Risiko"])}
+let stopPct=clamp(Math.max(Math.abs(ch24),Math.abs(ch7)/3,5)*.75,6,12),targetPct=clamp(stopPct*2.1,13,28),rr=targetPct/stopPct;if(rr>=2){e+=8;pos.push(["✅","Chance/Risiko über 2"])}
+q=clamp(Math.round(q),0,100);e=clamp(Math.round(e),0,100);risk=clamp(Math.round(risk),0,100);let conf=clamp(Math.round(q*.35+e*.45+(100-risk)*.20),0,100),decision="NICHT KAUFEN",color="red";if(q>=70&&e>=75&&risk<=55&&conf>=70){decision="KAUFEN";color="green"}else if(q>=65&&e>=55&&conf>=60){decision="BEOBACHTEN";color="yellow"}else if(q>=60&&e<55){decision="WARTEN";color="orange"}if(!neg.length)neg.push(["➖","keine starken Gegenargumente"]);return{...c,ch1,ch24,ch7,ch30,rel,relVol,quality:q,entry:e,risk,confidence:conf,decision,color,pos,neg,stop:c.current_price*(1-stopPct/100),target:c.current_price*(1+targetPct/100),rr,marketMood:phase}}
+async function scan(){try{load(true);status("Scan läuft");let per=Number(document.getElementById("scanSize").value||100),[top,fixed]=await Promise.all([markets(null,per),markets(FIXED,250)]),map=new Map();[...top,...fixed].forEach(c=>map.set(c.id,c));let all=[...map.values()],btc=all.find(c=>c.id==="bitcoin"),med=median(all.map(c=>c.market_cap?c.total_volume/c.market_cap:0).filter(x=>x>0)),phase=marketPhase(all,btc);state.scans=all.map(c=>evaluate(c,btc,med,phase)).sort((a,b)=>b.confidence-a.confidence);state.lastScan="Letzter Scan: "+new Date().toLocaleString("de-DE");pushEquity();save();checkSellSignals();status("Scan fertig")}catch(e){alert(e.message);status("Fehler")}finally{load(false)}}
+function equity(){return state.cash+state.positions.reduce((a,p)=>a+p.qty*(p.lastPrice||p.entry),0)}function pushEquity(){let v=equity(),l=state.equity.at(-1);if(!l||Math.abs(l.value-v)>.001){state.equity.push({date:new Date().toISOString(),value:v});if(state.equity.length>160)state.equity=state.equity.slice(-160)}}function prepare(c){tradeId.value=c.id;tradeSymbol.value=c.symbol.toUpperCase();tradePrice.value=c.current_price;tradeAmount.value=Math.min(state.cash,100).toFixed(2);stopLoss.value=c.stop.toFixed(8);takeProfit.value=c.target.toFixed(8);tradeNote.value=`${c.decision}. Qualität ${c.quality}/100, Einstieg ${c.entry}/100, Risiko ${c.risk}/100, Confidence ${c.confidence}/100.`;document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById("trade").classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab")[2].classList.add("active");render()}
 function buyOne(){let id=tradeId.value.trim(),symbol=tradeSymbol.value.trim().toUpperCase(),entry=Number(tradePrice.value),amount=Number(tradeAmount.value),stop=Number(stopLoss.value),target=Number(takeProfit.value),note=tradeNote.value.trim();if(!id||!symbol||!entry||!amount)return alert("Daten fehlen.");if(amount>state.cash)return alert("Nicht genug Cash.");if(state.positions.find(p=>p.id===id))return alert("Position schon offen.");state.cash-=amount;state.positions.push({id,symbol,entry,amount,qty:amount/entry,stop,target,note,date:new Date().toISOString(),lastPrice:entry});state.history.push({type:"BUY",id,symbol,entry,amount,note,date:new Date().toISOString()});pushEquity();save()}
-
-
-function baseCandidates(minScore=80){
-  let max=Number(document.getElementById("basketCount")?.value||8);
-  return state.scans
-    .filter(c=>c.score>=minScore&&c.id!=="bitcoin"&&!state.positions.find(p=>p.id===c.id))
-    .slice(0,max);
-}
-function visibleCandidates(){
-  let max=Number(document.getElementById("basketCount")?.value||8);
-  let list=[...state.scans];
-  if(mode==="buy")list=list.filter(c=>c.score>=80);
-  if(mode==="watch")list=list.filter(c=>c.score>=65&&c.score<80);
-  if(mode==="risk")list=list.filter(c=>c.score>=50&&c.score<65);
-  if(mode==="fixed")list=list.filter(c=>FIXED.includes(c.id));
-  if(mode==="all")list=list.filter(c=>c.score>=65);
-  return list.filter(c=>c.id!=="bitcoin"&&!state.positions.find(p=>p.id===c.id)).slice(0,max);
-}
-function getBasketTotal(){
-  let total=Number(document.getElementById("basketAmount").value)||state.cash;
-  if(total>state.cash){alert("Nicht genug Cash.");return null}
-  if(total<=0){alert("Kein Cash verfügbar.");return null}
-  return total;
-}
-function openBasket(picks, allocations, label){
-  if(!picks.length)return alert("Keine passenden Kandidaten vorhanden.");
-  if(!confirm(`${picks.length} Kandidaten kaufen? Methode: ${label}`))return;
-  picks.forEach((c,i)=>{
-    let amount=allocations[i];
-    if(amount<1)return;
-    let entry=c.current_price;
-    state.cash-=amount;
-    state.positions.push({id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,qty:amount/entry,stop:c.stop,target:c.target,note:`${label}. Score ${c.score}/100`,date:new Date().toISOString(),lastPrice:entry});
-    state.history.push({type:"BUY",id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,note:`${label}. Score ${c.score}/100`,date:new Date().toISOString()});
-  });
-  pushEquity();save();
-}
-function equalAlloc(picks,total){
-  let each=total/picks.length;
-  if(each<1){alert("Betrag pro Coin zu klein.");return null}
-  return picks.map(()=>each);
-}
-function weightedAlloc(picks,total){
-  if(!picks.length)return null;
-  let weights=picks.map(c=>Math.max(c.score-60,5));
-  let sum=weights.reduce((a,b)=>a+b,0);
-  let raw=weights.map(w=>total*w/sum);
-  let cap=total*0.35, floor=Math.min(total*0.05,total/picks.length);
-  let capped=raw.map(x=>Math.max(floor,Math.min(cap,x)));
-  let scale=total/capped.reduce((a,b)=>a+b,0);
-  let allocations=capped.map(x=>x*scale);
-  if(Math.min(...allocations)<1){alert("Betrag pro Coin zu klein.");return null}
-  return allocations;
-}
-function buyGreenEqual(){
-  let picks=baseCandidates(80),total=getBasketTotal();if(total===null)return;
-  let allocations=equalAlloc(picks,total);if(!allocations)return;
-  openBasket(picks,allocations,"Grün gleich verteilt");
-}
-function buyGreenWeighted(){
-  let picks=baseCandidates(80),total=getBasketTotal();if(total===null)return;
-  let allocations=weightedAlloc(picks,total);if(!allocations)return;
-  openBasket(picks,allocations,"Grün scoregewichtet");
-}
-function buyBroadWeighted(){
-  let picks=baseCandidates(65),total=getBasketTotal();if(total===null)return;
-  let allocations=weightedAlloc(picks,total);if(!allocations)return;
-  openBasket(picks,allocations,"Breiter Korb ab Score 65");
-}
-function buyVisibleWeighted(){
-  let picks=visibleCandidates(),total=getBasketTotal();if(total===null)return;
-  let allocations=weightedAlloc(picks,total);if(!allocations)return;
-  openBasket(picks,allocations,"Aktuelle Ansicht scoregewichtet");
-}
-async function refreshPositions(){if(!state.positions.length)return;try{status("Aktualisiere");let data=await markets(state.positions.map(p=>p.id),250),by=new Map(data.map(c=>[c.id,c]));state.positions.forEach(p=>{let c=by.get(p.id);if(c)p.lastPrice=c.current_price});pushEquity();save();checkSellSignals();status("Aktualisiert")}catch(e){alert(e.message);status("Fehler")}}
-function sellAt(i){let p=state.positions[i];if(!p)return;let exit=p.lastPrice||p.entry,value=p.qty*exit,pl=value-p.amount;state.cash+=value;state.history.push({type:"SELL",id:p.id,symbol:p.symbol,entry:p.entry,exit,amount:p.amount,pl,note:p.note,date:new Date().toISOString()});state.positions.splice(i,1);pushEquity();save()}
-function card(c){return `<div class="coin"><div class="head"><div><div class="name">${c.symbol.toUpperCase()} · ${c.name}</div><small>${c.id}</small></div><div class="score ${c.color}" style="--s:${c.score}">${c.score}</div></div><div><span class="pill ${c.color}">${c.verdict}</span></div><div class="metrics"><div class="metric"><span class="label">Kurs</span><b>${eur(c.current_price)}</b></div><div class="metric"><span class="label">24h</span><b class="${c.ch24>=0?'goodText':'badText'}">${pct(c.ch24)}</b></div><div class="metric"><span class="label">Rel. Vol</span><b>${c.relVol.toFixed(2)}x</b></div><div class="metric"><span class="label">BTC-Stärke</span><b class="${c.rel>=0?'goodText':'badText'}">${pct(c.rel)}</b></div><div class="metric"><span class="label">Stop</span><b>${eur(c.stop)}</b></div><div class="metric"><span class="label">Ziel</span><b>${eur(c.target)}</b></div></div><div>${c.reasons.slice(0,6).map(r=>`<div><span>${r[0]}</span> ${r[1]}</div>`).join("")}</div><div class="actions"><button class="good" onclick='prepare(${JSON.stringify(c).replaceAll("'","&apos;")})'>Trade vorbereiten</button></div></div>`}
-function render(){let eq=equity(),pl=eq-state.start;cash.textContent=eur(state.cash);document.getElementById("equity").textContent=eur(eq);posCount.textContent=state.positions.length;let plEl=document.getElementById("pl");plEl.textContent=eur(pl);plEl.className="value "+(pl>=0?"goodText":"badText");if(state.lastScan)lastScan.textContent=state.lastScan;renderPulse();renderResults();renderPositions();renderHomePositions();renderHistory();renderAlertLog();draw()}
-function renderTop(){let picks=state.scans.filter(c=>c.score>=65&&c.id!=="bitcoin").slice(0,10);top5.innerHTML=picks.length?picks.map((c,i)=>`<div class="rankItem"><div class="rankNo">${i+1}</div><div><b>${c.symbol.toUpperCase()} · ${c.name}</b><br><small>${c.verdict} · 24h ${pct(c.ch24)} · RelVol ${c.relVol.toFixed(2)}x</small></div><span class="pill ${c.color}">${c.score}</span></div>`).join(""):`<div class="notice">Noch kein Scan.</div>`}
-function renderPulse(){if(!state.scans.length){pulse.innerHTML="Noch kein Scan. Scanner öffnen und Markt scannen.";return}let btc=state.scans.find(c=>c.id==="bitcoin"),buy=state.scans.filter(c=>c.score>=80).length,watch=state.scans.filter(c=>c.score>=65&&c.score<80).length,avg=state.scans.slice(0,50).reduce((a,c)=>a+c.score,0)/Math.min(50,state.scans.length);let mood=avg>=62?"Risikofreudig":avg>=52?"Neutral":"Schwach";pulse.innerHTML=`Letzter Scan:<br><span class="muted">${state.lastScan||"-"}</span><br><br>BTC 24h: <b class="${(btc?.ch24||0)>=0?'goodText':'badText'}">${pct(btc?.ch24||0)}</b><br>Marktlage: <b>${mood}</b> (${avg.toFixed(0)}/100)<br>Grüne Kandidaten: <b>${buy}</b><br>Beobachten: <b>${watch}</b>`}
-function renderResults(){if(!results)return;if(!state.scans.length){results.innerHTML=`<div class="card"><div class="notice">Noch keine Daten.</div></div>`;return}let list=[...state.scans];if(mode==="buy")list=list.filter(c=>c.score>=80);if(mode==="watch")list=list.filter(c=>c.score>=65&&c.score<80);if(mode==="risk")list=list.filter(c=>c.score>=50&&c.score<65);if(mode==="fixed")list=list.filter(c=>FIXED.includes(c.id));if(mode==="all")list=list.slice(0,50);results.innerHTML=list.length?list.map(card).join(""):`<div class="card"><div class="notice">Keine Treffer.</div></div>`}
-
-function renderHomePositions(){
-  const root=document.getElementById("homePositions");
-  if(!root)return;
-  if(!state.positions.length){
-    root.innerHTML="Keine offenen Positionen. Käufe erscheinen hier erst nach einem virtuellen Kauf.";
-    return;
-  }
-  root.innerHTML=state.positions.map((p,i)=>{
-    let last=p.lastPrice||p.entry,val=p.qty*last,pl=val-p.amount,pp=(last/p.entry-1)*100;
-    let stopGap=((last/p.stop)-1)*100;
-    let targetGap=((p.target/last)-1)*100;
-    return `<div class="history">
-      <b>${p.symbol}</b><br>
-      <span class="muted">${p.id}</span><br>
-      Kaufkurs: ${eur(p.entry)} · Aktuell: ${eur(last)}<br>
-      Einsatz: ${eur(p.amount)} · Wert: ${eur(val)}<br>
-      P/L: <span class="${pl>=0?'goodText':'badText'}">${eur(pl)} (${pct(pp)})</span><br>
-      Stop: ${eur(p.stop)} <span class="muted">(${pct(stopGap)} Abstand)</span><br>
-      Ziel: ${eur(p.target)} <span class="muted">(${pct(targetGap)} bis Ziel)</span>
-      <div class="actions">
-        <button class="secondary" onclick="refreshPositions()">Aktualisieren</button>
-        <button class="danger" onclick="sellAt(${i})">Verkaufen</button>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-function renderPositions(){if(!positions)return;if(!state.positions.length){positions.innerHTML="Keine offenen Positionen.";return}positions.innerHTML=state.positions.map((p,i)=>{let last=p.lastPrice||p.entry,val=p.qty*last,pl=val-p.amount,pp=(last/p.entry-1)*100;return `<div class="history"><b>${p.symbol}</b><br>Entry: ${eur(p.entry)} · Aktuell: ${eur(last)}<br>Einsatz: ${eur(p.amount)} · Wert: ${eur(val)}<br>P/L: <span class="${pl>=0?'goodText':'badText'}">${eur(pl)} (${pct(pp)})</span><br>Stop: ${eur(p.stop)} · Ziel: ${eur(p.target)}<div class="actions"><button class="danger" onclick="sellAt(${i})">Verkaufen</button></div></div>`}).join("")}
-function renderHistory(){if(!history)return;history.innerHTML=state.history.length?state.history.slice().reverse().map(h=>`<div class="history"><b>${h.type} ${h.symbol}</b><br><small>${new Date(h.date).toLocaleString("de-DE")}</small><br>Entry: ${h.entry?eur(h.entry):"-"} ${h.exit?"· Exit: "+eur(h.exit):""} · Einsatz: ${eur(h.amount)}${h.pl!==undefined?`<br><span class="${h.pl>=0?'goodText':'badText'}">P/L: ${eur(h.pl)}</span>`:""}<br><span class="muted">${h.note||""}</span></div>`).join(""):"<small>Noch keine Trades.</small>"}
+function candidates(kind){let max=Number(basketCount.value||5),list=state.scans.filter(c=>c.id!=="bitcoin"&&!state.positions.find(p=>p.id===c.id));list=kind==="entry"?list.filter(c=>c.decision==="KAUFEN"):list.filter(c=>c.decision==="KAUFEN"||c.decision==="BEOBACHTEN");return list.slice(0,max)}function openBasket(picks,label){if(!picks.length)return alert("Keine passenden Kandidaten.");let total=Number(basketAmount.value)||state.cash;if(total>state.cash)return alert("Nicht genug Cash.");let weights=picks.map(c=>Math.max(c.confidence-55,5)),sum=weights.reduce((a,b)=>a+b,0),alloc=weights.map(w=>total*w/sum);if(Math.min(...alloc)<1)return alert("Betrag pro Coin zu klein.");if(!confirm(`${picks.length} Kandidaten kaufen? ${label}`))return;picks.forEach((c,i)=>{let amount=alloc[i],entry=c.current_price;state.cash-=amount;state.positions.push({id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,qty:amount/entry,stop:c.stop,target:c.target,note:`${label}. Q${c.quality}/E${c.entry}/R${c.risk}/C${c.confidence}`,date:new Date().toISOString(),lastPrice:entry,quality:c.quality,entryScore:c.entry,risk:c.risk,confidence:c.confidence});state.history.push({type:"BUY",id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,note:`${label}. Q${c.quality}/E${c.entry}/R${c.risk}/C${c.confidence}`,date:new Date().toISOString()})});pushEquity();save()}function buyEntryBasket(){openBasket(candidates("entry"),"Korb nur KAUFEN")}function buyWatchBasket(){openBasket(candidates("watch"),"Korb KAUFEN+BEOBACHTEN")}
+async function refreshPositions(){if(!state.positions.length)return;try{status("Aktualisiere");let data=await markets(state.positions.map(p=>p.id),250),by=new Map(data.map(c=>[c.id,c]));state.positions.forEach(p=>{let c=by.get(p.id);if(c)p.lastPrice=c.current_price});pushEquity();save();checkSellSignals();status("Aktualisiert")}catch(e){alert(e.message);status("Fehler")}}function sellAt(i,part=1){let p=state.positions[i];if(!p)return;let exit=p.lastPrice||p.entry,qty=p.qty*part,value=qty*exit,amount=p.amount*part,pl=value-amount;state.cash+=value;state.history.push({type:part<1?"PART SELL":"SELL",id:p.id,symbol:p.symbol,entry:p.entry,exit,amount,pl,note:p.note,date:new Date().toISOString()});if(part>=1)state.positions.splice(i,1);else{p.qty-=qty;p.amount-=amount}pushEquity();save()}function management(p){let last=p.lastPrice||p.entry,pp=(last/p.entry-1)*100,msg="HALTEN",color="yellow";if(p.stop&&last<=p.stop){msg="VERKAUF PRÜFEN";color="red"}else if(p.target&&last>=p.target){msg="TEILGEWINN PRÜFEN";color="green"}else if(pp>=12){msg="STOP ANZIEHEN";color="green"}else if(pp<=-10){msg="RISIKO REDUZIEREN";color="red"}return{msg,color,pp}}
+function card(c){return `<div class="coin"><div class="head"><div><div class="name">${c.symbol.toUpperCase()} · ${c.name}</div><div class="sub">${c.id}</div></div><div class="score ${c.color}" style="--s:${c.confidence}">${c.confidence}</div></div><div><span class="pill ${c.color}">${c.decision}</span> <span class="pill">Markt: ${c.marketMood}</span> <span class="pill">R/R ${c.rr.toFixed(1)}</span></div><div class="metrics"><div class="metric"><span class="label">Qualität</span><b>${c.quality}/100</b></div><div class="metric"><span class="label">Einstieg</span><b>${c.entry}/100</b></div><div class="metric"><span class="label">Risiko</span><b class="${c.risk>60?'badText':c.risk>35?'warnText':'goodText'}">${c.risk}/100</b></div><div class="metric"><span class="label">Confidence</span><b>${c.confidence}/100</b></div><div class="metric"><span class="label">24h</span><b class="${c.ch24>=0?'goodText':'badText'}">${pct(c.ch24)}</b></div><div class="metric"><span class="label">Rel. Vol</span><b>${c.relVol.toFixed(2)}x</b></div><div class="metric"><span class="label">BTC-Stärke</span><b class="${c.rel>=0?'goodText':'badText'}">${pct(c.rel)}</b></div><div class="metric"><span class="label">Stop</span><b>${eur(c.stop)}</b></div><div class="metric"><span class="label">Ziel</span><b>${eur(c.target)}</b></div></div><div class="columns"><div><b>Warum dafür?</b><div class="reasonGrid">${c.pos.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div><div><b>Warum nicht kaufen?</b><div class="reasonGrid">${c.neg.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div></div><div class="actions"><button class="good" onclick='prepare(${JSON.stringify(c).replaceAll("'","&apos;")})'>Trade vorbereiten</button></div></div>`}
+function render(){let eq=equity(),pnl=eq-state.start;cash.textContent=eur(state.cash);document.getElementById("equity").textContent=eur(eq);posCount.textContent=state.positions.length;pl.textContent=eur(pnl);pl.className="value "+(pnl>=0?"goodText":"badText");if(state.lastScan)lastScan.textContent=state.lastScan;renderPulse();renderEntries();renderResults();renderHomePositions();renderPositions();renderHistory();renderAlertLog();draw()}
+function renderEntries(){let root=topEntries;if(!root)return;let picks=state.scans.filter(c=>c.decision==="KAUFEN").slice(0,10);root.innerHTML=picks.length?picks.map((c,i)=>`<div class="rankItem"><div class="rankNo">${i+1}</div><div><b>${c.symbol.toUpperCase()} · ${c.name}</b><br><small>Q${c.quality} · E${c.entry} · R${c.risk} · C${c.confidence}</small></div><span class="pill ${c.color}">${c.decision}</span></div>`).join(""):`<div class="notice">Keine echten Einstiegskandidaten. Das ist ein gültiges Ergebnis.</div>`}function renderPulse(){if(!state.scans.length){pulse.innerHTML="Noch kein Scan.";return}let btc=state.scans.find(c=>c.id==="bitcoin"),buy=state.scans.filter(c=>c.decision==="KAUFEN").length,watch=state.scans.filter(c=>c.decision==="BEOBACHTEN").length,phase=state.scans[0]?.marketMood||"neutral";pulse.innerHTML=`Letzter Scan:<br><span class="muted">${state.lastScan||"-"}</span><br><br>BTC 24h: <b class="${(btc?.ch24||0)>=0?'goodText':'badText'}">${pct(btc?.ch24||0)}</b><br>Marktphase: <b>${phase}</b><br>Kaufen: <b>${buy}</b><br>Beobachten: <b>${watch}</b>`}
+function renderResults(){if(!results)return;if(!state.scans.length){results.innerHTML=`<div class="card"><div class="notice">Noch keine Daten.</div></div>`;return}let list=[...state.scans];if(mode==="entry")list=list.filter(c=>c.decision==="KAUFEN");if(mode==="watch")list=list.filter(c=>c.decision==="BEOBACHTEN");if(mode==="wait")list=list.filter(c=>c.decision==="WARTEN"||c.decision==="NICHT KAUFEN");if(mode==="fixed")list=list.filter(c=>FIXED.includes(c.id));if(mode==="all")list=list.slice(0,50);results.innerHTML=list.length?list.map(card).join(""):`<div class="card"><div class="notice">Keine Treffer.</div></div>`}
+function posHtml(p,i,compact){let last=p.lastPrice||p.entry,val=p.qty*last,pnl=val-p.amount,pp=(last/p.entry-1)*100,m=management(p);return `<div class="history"><b>${p.symbol}</b> <span class="pill ${m.color}">${m.msg}</span><br><span class="muted">${p.id}</span><br>Entry: ${eur(p.entry)} · Aktuell: ${eur(last)}<br>Einsatz: ${eur(p.amount)} · Wert: ${eur(val)}<br>P/L: <span class="${pnl>=0?'goodText':'badText'}">${eur(pnl)} (${pct(pp)})</span><br>Stop: ${eur(p.stop)} · Ziel: ${eur(p.target)}${compact?"":`<div class="actions"><button class="secondary" onclick="sellAt(${i},0.5)">50 % Teilverkauf</button><button class="danger" onclick="sellAt(${i})">Alles verkaufen</button></div>`}</div>`}
+function renderHomePositions(){homePositions.innerHTML=state.positions.length?state.positions.map((p,i)=>posHtml(p,i,true)).join(""):"Keine offenen Positionen."}function renderPositions(){if(!positions)return;positions.innerHTML=state.positions.length?state.positions.map((p,i)=>posHtml(p,i,false)).join(""):"Keine offenen Positionen."}function renderHistory(){history.innerHTML=state.history.length?state.history.slice().reverse().map(h=>`<div class="history"><b>${h.type} ${h.symbol}</b><br><small>${new Date(h.date).toLocaleString("de-DE")}</small><br>Entry: ${h.entry?eur(h.entry):"-"} ${h.exit?"· Exit: "+eur(h.exit):""} · Einsatz: ${eur(h.amount)}${h.pl!==undefined?`<br><span class="${h.pl>=0?'goodText':'badText'}">P/L: ${eur(h.pl)}</span>`:""}<br><span class="muted">${h.note||""}</span></div>`).join(""):"<small>Noch keine Trades.</small>"}
 function draw(){let c=document.getElementById("chart");if(!c)return;let ctx=c.getContext("2d"),r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;ctx.scale(d,d);ctx.clearRect(0,0,r.width,r.height);let vals=state.equity.map(x=>x.value),min=Math.min(...vals,95),max=Math.max(...vals,105),pad=18;ctx.strokeStyle="#27344d";for(let i=0;i<4;i++){let y=pad+i*(r.height-pad*2)/3;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(r.width-pad,y);ctx.stroke()}ctx.strokeStyle="#4a7dff";ctx.lineWidth=3;ctx.beginPath();vals.forEach((v,i)=>{let x=pad+(i/Math.max(vals.length-1,1))*(r.width-pad*2),y=r.height-pad-((v-min)/(max-min||1))*(r.height-pad*2);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke()}
-
-function requestNotifications(){
-  if(!("Notification" in window)){
-    alert("Dieser Browser unterstützt keine Web-Benachrichtigungen.");
-    return;
-  }
-  Notification.requestPermission().then(p=>{
-    document.getElementById("autoStatus").textContent = p==="granted" ? "Benachrichtigungen erlaubt." : "Benachrichtigungen nicht erlaubt.";
-  });
-}
-function sendNotify(title,body){
-  addAlert(title + " · " + body);
-  if("Notification" in window && Notification.permission==="granted"){
-    try{ new Notification(title,{body}); }catch(e){}
-  }
-}
-function addAlert(text){
-  state.alerts.unshift({date:new Date().toISOString(),text});
-  state.alerts=state.alerts.slice(0,20);
-  localStorage.setItem(KEY,JSON.stringify(state));
-  renderAlertLog();
-}
-function renderAlertLog(){
-  const root=document.getElementById("alertLog");
-  if(!root)return;
-  if(!state.alerts.length){root.innerHTML="Noch keine Warnungen.";return}
-  root.innerHTML=state.alerts.slice(0,5).map(a=>`<div class="history"><b>${new Date(a.date).toLocaleString("de-DE")}</b><br>${a.text}</div>`).join("");
-}
-function checkSellSignals(){
-  for(const p of state.positions){
-    const last=p.lastPrice||p.entry;
-    const plPct=(last/p.entry-1)*100;
-    if(p.stop && last<=p.stop && !p.alertedStop){
-      p.alertedStop=true;
-      sendNotify(`Verkaufen prüfen: ${p.symbol}`, `Stop-Loss erreicht. Kurs ${eur(last)}, Stop ${eur(p.stop)}.`);
-    }
-    if(p.target && last>=p.target && !p.alertedTarget){
-      p.alertedTarget=true;
-      sendNotify(`Gewinn sichern prüfen: ${p.symbol}`, `Take-Profit erreicht. Kurs ${eur(last)}, Ziel ${eur(p.target)}.`);
-    }
-    if(plPct<=-12 && !p.alertedLoss){
-      p.alertedLoss=true;
-      sendNotify(`Warnung: ${p.symbol}`, `Position liegt ${pct(plPct)} im Minus.`);
-    }
-  }
-  localStorage.setItem(KEY,JSON.stringify(state));
-}
-async function autoCycle(){
-  try{
-    await scan();
-    await refreshPositions();
-    checkSellSignals();
-  }catch(e){
-    addAlert("Auto-Wächter Fehler: "+e.message);
-  }
-}
-function startAutoWatch(){
-  stopAutoWatch();
-  const mins=Number(document.getElementById("autoMinutes").value||30);
-  document.getElementById("autoStatus").textContent=`Auto-Wächter läuft: alle ${mins} Minuten. App muss offen bleiben.`;
-  autoCycle();
-  autoTimer=setInterval(autoCycle, mins*60*1000);
-}
-function stopAutoWatch(){
-  if(autoTimer){clearInterval(autoTimer);autoTimer=null}
-  const el=document.getElementById("autoStatus");
-  if(el)el.textContent="Auto-Wächter aus.";
-}
-
-function exportData(){let blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="crypto-scout-v4-export.json";a.click()}
-function resetAll(){if(!confirm("Alles löschen?"))return;state={cash:100,start:100,positions:[],scans:[],history:[],equity:[{date:new Date().toISOString(),value:100}],lastScan:"",alerts:[]};save()}
-render()
-</script>
-</body>
-</html>
+function requestNotifications(){if(!("Notification"in window)){alert("Keine Web-Benachrichtigungen unterstützt.");return}Notification.requestPermission().then(p=>autoStatus.textContent=p==="granted"?"Benachrichtigungen erlaubt.":"Benachrichtigungen nicht erlaubt.")}function notify(t,b){addAlert(t+" · "+b);if("Notification"in window&&Notification.permission==="granted")try{new Notification(t,{body:b})}catch(e){}}function addAlert(text){state.alerts.unshift({date:new Date().toISOString(),text});state.alerts=state.alerts.slice(0,20);localStorage.setItem(KEY,JSON.stringify(state));renderAlertLog()}function renderAlertLog(){let root=document.getElementById("alertLog");if(!root)return;root.innerHTML=state.alerts.length?state.alerts.slice(0,5).map(a=>`<div class="history"><b>${new Date(a.date).toLocaleString("de-DE")}</b><br>${a.text}</div>`).join(""):"Noch keine Warnungen."}
+function checkSellSignals(){state.positions.forEach(p=>{let last=p.lastPrice||p.entry,pp=(last/p.entry-1)*100;if(p.stop&&last<=p.stop&&!p.alertedStop){p.alertedStop=true;notify(`Verkauf prüfen: ${p.symbol}`,`Stop erreicht. Kurs ${eur(last)}`)}if(p.target&&last>=p.target&&!p.alertedTarget){p.alertedTarget=true;notify(`Teilgewinn prüfen: ${p.symbol}`,`Ziel erreicht. Kurs ${eur(last)}`)}if(pp<=-10&&!p.alertedLoss){p.alertedLoss=true;notify(`Risiko: ${p.symbol}`,`Position ${pct(pp)} im Minus.`)}if(pp>=12&&!p.alertedTrail){p.alertedTrail=true;notify(`Stop anziehen: ${p.symbol}`,`Position ${pct(pp)} im Plus.`)}});localStorage.setItem(KEY,JSON.stringify(state))}async function autoCycle(){try{await scan();await refreshPositions();checkSellSignals()}catch(e){addAlert("Auto-Wächter Fehler: "+e.message)}}function startAutoWatch(){stopAutoWatch();let mins=Number(autoMinutes.value||30);autoStatus.textContent=`Auto-Wächter läuft alle ${mins} Minuten. App muss offen bleiben.`;autoCycle();autoTimer=setInterval(autoCycle,mins*60*1000)}function stopAutoWatch(){if(autoTimer){clearInterval(autoTimer);autoTimer=null}if(document.getElementById("autoStatus"))autoStatus.textContent="Auto-Wächter aus. App muss offen bleiben."}
+function exportData(){let blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="crypto-scout-v5-export.json";a.click()}function resetAll(){if(!confirm("Alles löschen?"))return;state={cash:100,start:100,positions:[],scans:[],history:[],equity:[{date:new Date().toISOString(),value:100}],lastScan:"",alerts:[]};save()}render()
+</script></body></html>
