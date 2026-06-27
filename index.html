@@ -21,7 +21,8 @@
 </section>
 
 <section id="scanner" class="section">
-<div class="card"><h2>Scanner</h2><p>Qualität zeigt, ob der Coin interessant ist. Einstieg zeigt, ob jetzt gekauft werden sollte. Nur „Kaufen“ ist ein echter Einstiegskandidat.</p><div class="row"><select id="scanSize"><option value="50">Top 50</option><option value="100" selected>Top 100</option><option value="150">Top 150</option><option value="250">Top 250</option></select><button onclick="scan()">Scannen</button></div><br><div class="row"><input id="basketAmount" type="number" step="1" placeholder="Betrag für Korb, leer = gesamtes Cash"><select id="basketCount"><option value="3">Top 3</option><option value="5" selected>Top 5</option><option value="8">Top 8</option><option value="10">Top 10</option></select></div><br><div class="row"><button class="good" onclick="buyEntryBasket()">Nur Kaufen scoregewichtet</button><button class="secondary" onclick="buyWatchBasket()">Kaufen+Beobachten ab 70</button></div><br><div class="smallBtns"><button onclick="mode='entry';render()">Kaufen</button><button onclick="mode='watch';render()">Beobachten</button><button onclick="mode='wait';render()">Warten</button><button onclick="mode='all';render()">Top 50</button><button onclick="mode='fixed';render()">Unsere 5</button></div></div>
+<div class="card"><h2>Scanner</h2><p>Qualität zeigt, ob der Coin interessant ist. Einstieg zeigt, ob jetzt gekauft werden sollte. Nur „Kaufen“ ist ein echter Einstiegskandidat.</p><div class="row"><select id="scanSize"><option value="50">Top 50</option><option value="100" selected>Top 100</option><option value="150">Top 150</option><option value="250">Top 250</option></select><button onclick="scan()">Scannen</button></div><br>
+      <div class="row"><select id="newsHours"><option value="24">News 24h</option><option value="72" selected>News 72h</option><option value="168">News 7 Tage</option></select><button class="secondary" onclick="scanNewsForVisible()">News prüfen</button></div><br><div class="row"><input id="basketAmount" type="number" step="1" placeholder="Betrag für Korb, leer = gesamtes Cash"><select id="basketCount"><option value="3">Top 3</option><option value="5" selected>Top 5</option><option value="8">Top 8</option><option value="10">Top 10</option></select></div><br><div class="row"><button class="good" onclick="buyEntryBasket()">Nur Kaufen scoregewichtet</button><button class="secondary" onclick="buyWatchBasket()">Kaufen+Beobachten ab 70</button></div><br><div class="smallBtns"><button onclick="mode='entry';render()">Kaufen</button><button onclick="mode='watch';render()">Beobachten</button><button onclick="mode='wait';render()">Warten</button><button onclick="mode='all';render()">Top 50</button><button onclick="mode='fixed';render()">Unsere 5</button></div></div>
 <div class="card"><h2>Top Einstiegskandidaten</h2><div id="topEntries" class="rank"><div class="notice">Noch kein Scan.</div></div></div><div id="results"></div>
 </section>
 
@@ -34,7 +35,7 @@
 <section id="roadmap" class="section">
   <div class="card"><h2>Entwicklungsstand</h2>
     <div class="stats">
-      <div class="stat"><div class="label">Version</div><div class="value">V5.3</div></div>
+      <div class="stat"><div class="label">Version</div><div class="value">V6.0</div></div>
       <div class="stat"><div class="label">Fortschritt</div><div class="value" id="devProgress">0 %</div></div>
       <div class="stat"><div class="label">Funktionen fertig</div><div class="value" id="doneCount">0/0</div></div>
       <div class="stat"><div class="label">Paper-Trades</div><div class="value" id="tradeCount">0</div></div>
@@ -78,6 +79,7 @@
       <div class="metric"><span class="label">Größe</span><b>Market Cap</b></div>
       <div class="metric"><span class="label">Benchmark</span><b>Bitcoin</b></div>
       <div class="metric"><span class="label">Eigene Daten</span><b>Paper-Trades</b></div>
+      <div class="metric"><span class="label">News</span><b>RSS-Feeds</b></div>
     </div>
   </div>
 
@@ -164,11 +166,35 @@
         Gesamtvertrauen in das Signal.<br><br>
         Berechnung:
         <ul>
-          <li>35 % Qualität</li>
-          <li>45 % Entry</li>
-          <li>20 % niedriges Risiko</li>
+          <li>30 % Qualität</li>
+          <li>35 % Entry</li>
+          <li>15 % niedriges Risiko</li>
+          <li>10 % BRSI</li>
+          <li>10 % News</li>
         </ul>
       </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3b. News Engine</h2>
+    <div class="notice">
+      Die News Engine prüft aktuelle Krypto-Nachrichten über öffentliche RSS-Feeds. Technisch nutzt die App einen RSS-zu-JSON-Dienst, damit die Feeds im Browser gelesen werden können.
+      Falls ein Feed blockiert wird oder ein Rate-Limit greift, zeigt die App weiterhin die Marktdaten und setzt den News-Score neutral.
+    </div>
+    <br>
+    <div class="metrics">
+      <div class="metric"><span class="label">Quellen</span><b>CoinDesk, Cointelegraph, Decrypt, The Block</b></div>
+      <div class="metric"><span class="label">Zeitraum</span><b>24h / 72h / 7 Tage</b></div>
+      <div class="metric"><span class="label">Standardwert</span><b>50 neutral</b></div>
+      <div class="metric"><span class="label">Einfluss</span><b>10 % Confidence</b></div>
+    </div>
+    <br>
+    <div class="checklist">
+      <div class="check"><b>Positive Signale:</b> Listings, Partnerschaften, ETF-Meldungen, Mainnet, Upgrades, Adoption, Funding.</div>
+      <div class="check"><b>Negative Signale:</b> Hacks, Exploits, Delistings, SEC/Regulierung, Outages, Token Unlocks, Fraud.</div>
+      <div class="check"><b>News-Score:</b> 0–40 negativ, 40–65 neutral, 65–100 positiv.</div>
+      <div class="check"><b>Schutzregel:</b> Negative Nachrichten können ein Kaufsignal blockieren, auch wenn Markt- und Entry-Daten gut aussehen.</div>
     </div>
   </div>
 
@@ -218,14 +244,14 @@
       <div class="check"><b>V4:</b> mehrere Positionen, Korb-Kauf und Depotansicht.</div>
       <div class="check"><b>V5:</b> Trading Engine mit Qualität, Entry, Risiko und Confidence.</div>
       <div class="check"><b>V5.1:</b> Roadmap, Strategie-Kennzahlen und Dokumentation.</div>
-      <div class="check"><b>V5.3:</b> BRSI Multi-Zeitrahmen-Stärke gegen Bitcoin.</div><div class="check"><b>V6 geplant:</b> technische Indikatoren, Backtesting, Lernfunktion und echte Pushs.</div>
+      <div class="check"><b>V5.3:</b> BRSI Multi-Zeitrahmen-Stärke gegen Bitcoin.</div><div class="check"><b>V6:</b> News Engine mit RSS-Feeds und News-Score.</div><div class="check"><b>V6 geplant:</b> technische Indikatoren, Backtesting, Lernfunktion und echte Pushs.</div>
     </div>
   </div>
 </section>
 </div>
 
 <script>
-const API="https://api.coingecko.com/api/v3",KEY="cryptoScoutV5",FIXED=["bitcoin","solana","hyperliquid","bittensor","ondo-finance"];let mode="entry",autoTimer=null;let state=JSON.parse(localStorage.getItem(KEY))||{cash:100,start:100,positions:[],scans:[],history:[],equity:[{date:new Date().toISOString(),value:100}],lastScan:"",alerts:[]};if(!Array.isArray(state.positions)){state.positions=state.position?[state.position]:[];delete state.position}if(!Array.isArray(state.alerts))state.alerts=[];
+const API="https://api.coingecko.com/api/v3",KEY="cryptoScoutV5",FIXED=["bitcoin","solana","hyperliquid","bittensor","ondo-finance"];let mode="entry",autoTimer=null;let state=JSON.parse(localStorage.getItem(KEY))||{cash:100,start:100,positions:[],scans:[],history:[],equity:[{date:new Date().toISOString(),value:100}],lastScan:"",alerts:[],newsCache:{},lastNewsScan:""};if(!Array.isArray(state.positions)){state.positions=state.position?[state.position]:[];delete state.position}if(!Array.isArray(state.alerts))state.alerts=[];if(!state.newsCache)state.newsCache={};
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}function eur(n){let x=Number(n)||0;if(Math.abs(x)<.01&&x!==0)return x.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:8})+" €";return x.toLocaleString("de-DE",{style:"currency",currency:"EUR"})}function pct(n){return(Number(n)||0).toFixed(2)+"%"}function clamp(n,a,b){return Math.max(a,Math.min(b,n))}function median(a){a=a.filter(x=>isFinite(x)).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:0}function tab(id,b){document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");render()}function status(t){document.getElementById("status").textContent=t}function load(on){document.getElementById("loader").classList.toggle("active",!!on)}
 async function markets(ids=null,per=100){let u=ids?`${API}/coins/markets?vs_currency=eur&ids=${encodeURIComponent(ids.join(","))}&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=1h,24h,7d,30d`:`${API}/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=${per}&page=1&sparkline=false&price_change_percentage=1h,24h,7d,30d`;let r=await fetch(u);if(!r.ok)throw new Error("CoinGecko Fehler / Rate Limit");return await r.json()}
 function marketPhase(all,btc){let btc24=btc?(btc.price_change_percentage_24h_in_currency??btc.price_change_percentage_24h??0):0,avg=all.slice(0,50).reduce((a,c)=>a+(c.price_change_percentage_24h_in_currency??c.price_change_percentage_24h??0),0)/Math.min(50,all.length);if(btc24>1.5&&avg>1)return"bull";if(btc24<-2||avg<-2)return"bear";return"neutral"}
@@ -243,13 +269,13 @@ if(ch7>5&&ch7<40){e+=12}else if(ch7>45){e-=14;risk+=18;neg.push(["❌","7d über
 if(rel>0)e+=12;else e-=6;if(relVol>1.2&&relVol<5)e+=12;else if(relVol>6){e-=6;risk+=12;neg.push(["⚠️","Volumen-Spike kann Exhaustion sein"])}
 if(phase==="bear"){e-=15;neg.push(["❌","Marktphase bärisch"])}else if(phase==="bull"){e+=8;pos.push(["✅","Marktphase unterstützt Risiko"])}
 let stopPct=clamp(Math.max(Math.abs(ch24),Math.abs(ch7)/3,5)*.75,6,12),targetPct=clamp(stopPct*2.1,13,28),rr=targetPct/stopPct;if(rr>=2){e+=8;pos.push(["✅","Chance/Risiko über 2"])}
-q=clamp(Math.round(q),0,100);e=clamp(Math.round(e),0,100);risk=clamp(Math.round(risk),0,100);let conf=clamp(Math.round(q*.35+e*.45+(100-risk)*.20),0,100),decision="NICHT KAUFEN",color="red";if(q>=70&&e>=75&&risk<=55&&conf>=70){decision="KAUFEN";color="green"}else if(q>=65&&e>=55&&conf>=60){decision="BEOBACHTEN";color="yellow"}else if(q>=60&&e<55){decision="WARTEN";color="orange"}if(!neg.length)neg.push(["➖","keine starken Gegenargumente"]);return{...c,ch1,ch24,ch7,ch30,rel,rel1,rel24,rel7,rel30,brsi,relVol,quality:q,entry:e,risk,confidence:conf,decision,color,pos,neg,stop:c.current_price*(1-stopPct/100),target:c.current_price*(1+targetPct/100),rr,marketMood:phase}}
+q=clamp(Math.round(q),0,100);e=clamp(Math.round(e),0,100);risk=clamp(Math.round(risk),0,100);let news=50,newsItems=[],newsTone="neutral";let conf=clamp(Math.round(q*.30+e*.35+(100-risk)*.15+brsi*.10+news*.10),0,100),decision="NICHT KAUFEN",color="red";if(q>=70&&e>=75&&risk<=55&&conf>=70){decision="KAUFEN";color="green"}else if(q>=65&&e>=55&&conf>=60){decision="BEOBACHTEN";color="yellow"}else if(q>=60&&e<55){decision="WARTEN";color="orange"}if(!neg.length)neg.push(["➖","keine starken Gegenargumente"]);return{...c,ch1,ch24,ch7,ch30,rel,rel1,rel24,rel7,rel30,brsi,relVol,news,newsItems,newsTone,quality:q,entry:e,risk,confidence:conf,decision,color,pos,neg,stop:c.current_price*(1-stopPct/100),target:c.current_price*(1+targetPct/100),rr,marketMood:phase}}
 async function scan(){try{load(true);status("Scan läuft");let per=Number(document.getElementById("scanSize").value||100),[top,fixed]=await Promise.all([markets(null,per),markets(FIXED,250)]),map=new Map();[...top,...fixed].forEach(c=>map.set(c.id,c));let all=[...map.values()],btc=all.find(c=>c.id==="bitcoin"),med=median(all.map(c=>c.market_cap?c.total_volume/c.market_cap:0).filter(x=>x>0)),phase=marketPhase(all,btc);state.scans=all.map(c=>evaluate(c,btc,med,phase)).sort((a,b)=>b.confidence-a.confidence);state.lastScan="Letzter Scan: "+new Date().toLocaleString("de-DE");pushEquity();save();checkSellSignals();status("Scan fertig")}catch(e){alert(e.message);status("Fehler")}finally{load(false)}}
 function equity(){return state.cash+state.positions.reduce((a,p)=>a+p.qty*(p.lastPrice||p.entry),0)}function pushEquity(){let v=equity(),l=state.equity.at(-1);if(!l||Math.abs(l.value-v)>.001){state.equity.push({date:new Date().toISOString(),value:v});if(state.equity.length>160)state.equity=state.equity.slice(-160)}}function prepare(c){tradeId.value=c.id;tradeSymbol.value=c.symbol.toUpperCase();tradePrice.value=c.current_price;tradeAmount.value=Math.min(state.cash,100).toFixed(2);stopLoss.value=c.stop.toFixed(8);takeProfit.value=c.target.toFixed(8);tradeNote.value=`${c.decision}. Qualität ${c.quality}/100, Einstieg ${c.entry}/100, Risiko ${c.risk}/100, Confidence ${c.confidence}/100.`;document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById("trade").classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab")[2].classList.add("active");render()}
 function buyOne(){let id=tradeId.value.trim(),symbol=tradeSymbol.value.trim().toUpperCase(),entry=Number(tradePrice.value),amount=Number(tradeAmount.value),stop=Number(stopLoss.value),target=Number(takeProfit.value),note=tradeNote.value.trim();if(!id||!symbol||!entry||!amount)return alert("Daten fehlen.");if(amount>state.cash)return alert("Nicht genug Cash.");if(state.positions.find(p=>p.id===id))return alert("Position schon offen.");state.cash-=amount;state.positions.push({id,symbol,entry,amount,qty:amount/entry,stop,target,note,date:new Date().toISOString(),lastPrice:entry});state.history.push({type:"BUY",id,symbol,entry,amount,note,date:new Date().toISOString()});pushEquity();save()}
 function candidates(kind){let max=Number(basketCount.value||5),list=state.scans.filter(c=>c.id!=="bitcoin"&&!state.positions.find(p=>p.id===c.id));list=kind==="entry"?list.filter(c=>c.decision==="KAUFEN"):list.filter(c=>c.decision==="KAUFEN"||c.decision==="BEOBACHTEN");return list.slice(0,max)}function openBasket(picks,label){if(!picks.length)return alert("Keine passenden Kandidaten.");let total=Number(basketAmount.value)||state.cash;if(total>state.cash)return alert("Nicht genug Cash.");let weights=picks.map(c=>Math.max(c.confidence-55,5)),sum=weights.reduce((a,b)=>a+b,0),alloc=weights.map(w=>total*w/sum);if(Math.min(...alloc)<1)return alert("Betrag pro Coin zu klein.");if(!confirm(`${picks.length} Kandidaten kaufen? ${label}`))return;picks.forEach((c,i)=>{let amount=alloc[i],entry=c.current_price;state.cash-=amount;state.positions.push({id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,qty:amount/entry,stop:c.stop,target:c.target,note:`${label}. Q${c.quality}/E${c.entry}/R${c.risk}/C${c.confidence}`,date:new Date().toISOString(),lastPrice:entry,quality:c.quality,entryScore:c.entry,risk:c.risk,confidence:c.confidence});state.history.push({type:"BUY",id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,note:`${label}. Q${c.quality}/E${c.entry}/R${c.risk}/C${c.confidence}`,date:new Date().toISOString()})});pushEquity();save()}function buyEntryBasket(){openBasket(candidates("entry"),"Korb nur KAUFEN")}function buyWatchBasket(){openBasket(candidates("watch"),"Korb KAUFEN+BEOBACHTEN")}
 async function refreshPositions(){if(!state.positions.length)return;try{status("Aktualisiere");let data=await markets(state.positions.map(p=>p.id),250),by=new Map(data.map(c=>[c.id,c]));state.positions.forEach(p=>{let c=by.get(p.id);if(c)p.lastPrice=c.current_price});pushEquity();save();checkSellSignals();status("Aktualisiert")}catch(e){alert(e.message);status("Fehler")}}function sellAt(i,part=1){let p=state.positions[i];if(!p)return;let exit=p.lastPrice||p.entry,qty=p.qty*part,value=qty*exit,amount=p.amount*part,pl=value-amount;state.cash+=value;state.history.push({type:part<1?"PART SELL":"SELL",id:p.id,symbol:p.symbol,entry:p.entry,exit,amount,pl,note:p.note,date:new Date().toISOString()});if(part>=1)state.positions.splice(i,1);else{p.qty-=qty;p.amount-=amount}pushEquity();save()}function management(p){let last=p.lastPrice||p.entry,pp=(last/p.entry-1)*100,msg="HALTEN",color="yellow";if(p.stop&&last<=p.stop){msg="VERKAUF PRÜFEN";color="red"}else if(p.target&&last>=p.target){msg="TEILGEWINN PRÜFEN";color="green"}else if(pp>=12){msg="STOP ANZIEHEN";color="green"}else if(pp<=-10){msg="RISIKO REDUZIEREN";color="red"}return{msg,color,pp}}
-function card(c){return `<div class="coin"><div class="head"><div><div class="name">${c.symbol.toUpperCase()} · ${c.name}</div><div class="sub">${c.id}</div></div><div class="score ${c.color}" style="--s:${c.confidence}">${c.confidence}</div></div><div><span class="pill ${c.color}">${c.decision}</span> <span class="pill">Markt: ${c.marketMood}</span> <span class="pill">R/R ${c.rr.toFixed(1)}</span></div><div class="metrics"><div class="metric"><span class="label">Qualität</span><b>${c.quality}/100</b></div><div class="metric"><span class="label">Einstieg</span><b>${c.entry}/100</b></div><div class="metric"><span class="label">Risiko</span><b class="${c.risk>60?'badText':c.risk>35?'warnText':'goodText'}">${c.risk}/100</b></div><div class="metric"><span class="label">Confidence</span><b>${c.confidence}/100</b></div><div class="metric"><span class="label">24h</span><b class="${c.ch24>=0?'goodText':'badText'}">${pct(c.ch24)}</b></div><div class="metric"><span class="label">Rel. Vol</span><b>${c.relVol.toFixed(2)}x</b></div><div class="metric"><span class="label">BRSI</span><b class="${c.brsi>=50?'goodText':'badText'}">${c.brsi}/100</b></div><div class="metric"><span class="label">Stop</span><b>${eur(c.stop)}</b></div><div class="metric"><span class="label">Ziel</span><b>${eur(c.target)}</b></div></div><div class="notice"><b>BTC Relative Strength:</b> 1h ${pct(c.rel1)} · 24h ${pct(c.rel24)} · 7d ${pct(c.rel7)} · 30d ${pct(c.rel30)}</div><div class="columns"><div><b>Warum dafür?</b><div class="reasonGrid">${c.pos.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div><div><b>Warum nicht kaufen?</b><div class="reasonGrid">${c.neg.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div></div><div class="actions"><button class="good" onclick='prepare(${JSON.stringify(c).replaceAll("'","&apos;")})'>Trade vorbereiten</button></div></div>`}
+function card(c){return `<div class="coin"><div class="head"><div><div class="name">${c.symbol.toUpperCase()} · ${c.name}</div><div class="sub">${c.id}</div></div><div class="score ${c.color}" style="--s:${c.confidence}">${c.confidence}</div></div><div><span class="pill ${c.color}">${c.decision}</span> <span class="pill">Markt: ${c.marketMood}</span> <span class="pill">R/R ${c.rr.toFixed(1)}</span></div><div class="metrics"><div class="metric"><span class="label">Qualität</span><b>${c.quality}/100</b></div><div class="metric"><span class="label">Einstieg</span><b>${c.entry}/100</b></div><div class="metric"><span class="label">Risiko</span><b class="${c.risk>60?'badText':c.risk>35?'warnText':'goodText'}">${c.risk}/100</b></div><div class="metric"><span class="label">Confidence</span><b>${c.confidence}/100</b></div><div class="metric"><span class="label">News</span><b class="${c.news>=65?'goodText':c.news<=40?'badText':'warnText'}">${c.news}/100</b></div><div class="metric"><span class="label">24h</span><b class="${c.ch24>=0?'goodText':'badText'}">${pct(c.ch24)}</b></div><div class="metric"><span class="label">Rel. Vol</span><b>${c.relVol.toFixed(2)}x</b></div><div class="metric"><span class="label">BRSI</span><b class="${c.brsi>=50?'goodText':'badText'}">${c.brsi}/100</b></div><div class="metric"><span class="label">Stop</span><b>${eur(c.stop)}</b></div><div class="metric"><span class="label">Ziel</span><b>${eur(c.target)}</b></div></div><div class="notice"><b>BTC Relative Strength:</b> 1h ${pct(c.rel1)} · 24h ${pct(c.rel24)} · 7d ${pct(c.rel7)} · 30d ${pct(c.rel30)}</div><div class="notice"><b>News Engine:</b> ${newsSummary(c)}</div><div class="columns"><div><b>Warum dafür?</b><div class="reasonGrid">${c.pos.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div><div><b>Warum nicht kaufen?</b><div class="reasonGrid">${c.neg.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div></div><div class="actions"><button class="good" onclick='prepare(${JSON.stringify(c).replaceAll("'","&apos;")})'>Trade vorbereiten</button></div></div>`}
 
 const ROADMAP_DONE=[
  "Qualität-, Einstieg-, Risiko- und Confidence-Score",
@@ -265,7 +291,8 @@ const ROADMAP_DONE=[
  "Journal und JSON-Export",
  "Sticky Menü oben",
  "Roadmap/Entwicklungsstand",
- "BRSI Multi-Zeitrahmen-Stärke gegen Bitcoin"
+ "BRSI Multi-Zeitrahmen-Stärke gegen Bitcoin",
+ "News Engine mit RSS-Feeds und News-Score"
 ];
 const ROADMAP_WORK=[
  "Gewichtung der Entry-Regeln anhand Paper-Trades verbessern",
@@ -319,6 +346,106 @@ function renderRoadmap(){
     Ø Verlust: <b class="badText">${eur(avgLoss)}</b><br>
     Profit-Faktor: <b>${pf===999?"∞":pf.toFixed(2)}</b>
   `;
+}
+
+
+const NEWS_KEYWORDS={
+  positive:["listing","listed","partnership","partners","integration","mainnet","upgrade","launch","etf","approval","funding","adoption","staking","burn","airdrop","collaboration","institutional","record inflows","all-time high","tvl rises"],
+  negative:["hack","exploit","breach","rug","delist","delisting","lawsuit","sec","investigation","outage","halt","vulnerability","token unlock","unlock","sell-off","dump","bankruptcy","sanction","fraud","phishing"]
+};
+const NEWS_FEEDS=[
+  "https://www.coindesk.com/arc/outboundfeeds/rss/",
+  "https://cointelegraph.com/rss",
+  "https://decrypt.co/feed",
+  "https://www.theblock.co/rss.xml"
+];
+function coinTerms(c){
+  const map={"bitcoin":["bitcoin","btc"],"solana":["solana","sol"],"hyperliquid":["hyperliquid","hype"],"bittensor":["bittensor","tao"],"ondo-finance":["ondo","ondo finance"]};
+  const base=[c.id,c.name,c.symbol].filter(Boolean).map(x=>String(x).toLowerCase());
+  return [...new Set([...(map[c.id]||[]),...base])].filter(x=>x.length>1);
+}
+function textScore(text){
+  const t=String(text||"").toLowerCase();
+  let score=0, hits=[];
+  NEWS_KEYWORDS.positive.forEach(k=>{if(t.includes(k)){score+=12;hits.push(["✅",k])}});
+  NEWS_KEYWORDS.negative.forEach(k=>{if(t.includes(k)){score-=18;hits.push(["❌",k])}});
+  return {score,hits};
+}
+async function fetchFeed(url){
+  const api="https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(url);
+  const r=await fetch(api);
+  if(!r.ok)throw new Error("Feed Fehler");
+  const j=await r.json();
+  return (j.items||[]).map(x=>({title:x.title||"",description:x.description||"",link:x.link||"",pubDate:x.pubDate||x.pubdate||""}));
+}
+async function scanNewsForCoins(coins){
+  const hours=Number(document.getElementById("newsHours")?.value||72);
+  const cutoff=Date.now()-hours*3600*1000;
+  let all=[];
+  for(const f of NEWS_FEEDS){
+    try{all=all.concat(await fetchFeed(f))}catch(e){}
+  }
+  if(!all.length){
+    alert("News konnten nicht geladen werden. Mögliche Ursache: CORS, Rate-Limit oder Feed nicht erreichbar.");
+    return;
+  }
+  coins.forEach(c=>{
+    const terms=coinTerms(c);
+    const matched=all.filter(item=>{
+      const d=item.pubDate?Date.parse(item.pubDate):Date.now();
+      if(Number.isFinite(d)&&d<cutoff)return false;
+      const text=(item.title+" "+item.description).toLowerCase();
+      return terms.some(term=>text.includes(term));
+    }).slice(0,8);
+    let raw=0, items=[];
+    matched.forEach(m=>{
+      const s=textScore(m.title+" "+m.description);
+      raw+=s.score;
+      items.push({title:m.title,link:m.link,pubDate:m.pubDate,score:s.score,hits:s.hits});
+    });
+    let news=clamp(Math.round(50+raw),0,100);
+    let tone=news>=65?"positive":news<=40?"negative":"neutral";
+    state.newsCache[c.id]={news,tone,items,checkedAt:new Date().toISOString()};
+  });
+  applyNewsToScans();
+  state.lastNewsScan="Letzter News-Check: "+new Date().toLocaleString("de-DE");
+  save();
+}
+function applyNewsToScans(){
+  state.scans=state.scans.map(c=>{
+    const n=state.newsCache[c.id];
+    if(!n)return c;
+    const news=n.news??50;
+    const newsTone=n.tone||"neutral";
+    const newsItems=n.items||[];
+    const confidence=clamp(Math.round(c.quality*.30+c.entry*.35+(100-c.risk)*.15+c.brsi*.10+news*.10),0,100);
+    let pos=[...(c.pos||[])],neg=[...(c.neg||[])];
+    if(news>=65)pos.unshift(["📰","positive Nachrichtenlage"]);
+    if(news<=40)neg.unshift(["📰","negative Nachrichtenlage"]);
+    let decision="NICHT KAUFEN",color="red";
+    if(c.quality>=70&&c.entry>=75&&c.risk<=55&&confidence>=70&&news>=45){decision="KAUFEN";color="green"}
+    else if(c.quality>=65&&c.entry>=55&&confidence>=60&&news>=40){decision="BEOBACHTEN";color="yellow"}
+    else if(c.quality>=60&&c.entry<55){decision="WARTEN";color="orange"}
+    return {...c,news,newsTone,newsItems,confidence,decision,color,pos,neg};
+  }).sort((a,b)=>b.confidence-a.confidence);
+}
+async function scanNewsForVisible(){
+  if(!state.scans.length)return alert("Erst Markt scannen.");
+  let list=[...state.scans];
+  if(mode==="entry")list=list.filter(c=>c.decision==="KAUFEN");
+  if(mode==="watch")list=list.filter(c=>c.decision==="BEOBACHTEN");
+  if(mode==="wait")list=list.filter(c=>c.decision==="WARTEN"||c.decision==="NICHT KAUFEN");
+  if(mode==="fixed")list=list.filter(c=>FIXED.includes(c.id));
+  if(mode==="all")list=list.slice(0,20);
+  list=list.filter(c=>c.id!=="bitcoin").slice(0,20);
+  status("News laufen");
+  await scanNewsForCoins(list);
+  status("News fertig");
+}
+function newsSummary(c){
+  const items=c.newsItems||[];
+  if(!items.length)return `Score ${c.news??50}/100 · keine passenden News im letzten Check oder News noch nicht geprüft.`;
+  return `Score ${c.news}/100 · ${items.slice(0,3).map(i=>i.title).join(" | ")}`;
 }
 
 function render(){let eq=equity(),pnl=eq-state.start;cash.textContent=eur(state.cash);document.getElementById("equity").textContent=eur(eq);posCount.textContent=state.positions.length;pl.textContent=eur(pnl);pl.className="value "+(pnl>=0?"goodText":"badText");if(state.lastScan)lastScan.textContent=state.lastScan;renderPulse();renderEntries();renderResults();renderHomePositions();renderPositions();renderHistory();renderAlertLog();renderRoadmap();draw()}
