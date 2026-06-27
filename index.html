@@ -34,7 +34,7 @@
 <section id="roadmap" class="section">
   <div class="card"><h2>Entwicklungsstand</h2>
     <div class="stats">
-      <div class="stat"><div class="label">Version</div><div class="value">V5.2</div></div>
+      <div class="stat"><div class="label">Version</div><div class="value">V5.3</div></div>
       <div class="stat"><div class="label">Fortschritt</div><div class="value" id="devProgress">0 %</div></div>
       <div class="stat"><div class="label">Funktionen fertig</div><div class="value" id="doneCount">0/0</div></div>
       <div class="stat"><div class="label">Paper-Trades</div><div class="value" id="tradeCount">0</div></div>
@@ -85,11 +85,33 @@
     <h2>2. Eigene Berechnungen</h2>
     <div class="checklist">
       <div class="check"><b>Relatives Volumen:</b> Handelsvolumen im Verhältnis zur Market Cap, verglichen mit dem Marktmedian.</div>
-      <div class="check"><b>Stärke gegenüber Bitcoin:</b> 24h-Performance des Coins minus 24h-Performance von Bitcoin.</div>
+      <div class="check"><b>BTC Relative Strength Index (BRSI):</b> Multi-Zeitrahmen-Vergleich gegen Bitcoin. Berechnung aus 1h, 24h, 7d und 30d relativer Performance.</div>
       <div class="check"><b>Marktphase:</b> bullisch, neutral oder bärisch anhand von BTC und Top-50-Marktbewegung.</div>
       <div class="check"><b>Chance/Risiko:</b> Verhältnis von Take-Profit-Abstand zu Stop-Loss-Abstand.</div>
       <div class="check"><b>Dynamischer Stop-Loss:</b> wird aus der aktuellen Volatilität abgeleitet.</div>
       <div class="check"><b>Dynamisches Take-Profit:</b> wird aus Stop-Abstand und Chance/Risiko berechnet.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2b. BTC Relative Strength Index (BRSI)</h2>
+    <div class="notice">
+      Früher wurde nur die 24h-Performance gegen Bitcoin verglichen. Das war zu kurzfristig.
+      Jetzt berechnet Crypto Scout einen gewichteten Multi-Zeitrahmen-Wert.
+    </div>
+    <br>
+    <div class="metrics">
+      <div class="metric"><span class="label">1 Stunde</span><b>10 % Gewicht</b></div>
+      <div class="metric"><span class="label">24 Stunden</span><b>25 % Gewicht</b></div>
+      <div class="metric"><span class="label">7 Tage</span><b>40 % Gewicht</b></div>
+      <div class="metric"><span class="label">30 Tage</span><b>25 % Gewicht</b></div>
+    </div>
+    <br>
+    <div class="checklist">
+      <div class="check"><b>Relative Stärke je Zeitraum:</b> Coin-Performance minus Bitcoin-Performance.</div>
+      <div class="check"><b>Gesamtwert:</b> 10 % 1h + 25 % 24h + 40 % 7d + 25 % 30d.</div>
+      <div class="check"><b>BRSI-Skala:</b> 0–30 deutlich schwächer, 30–50 leicht schwächer, 50–70 stärker, 70–100 deutlich stärker.</div>
+      <div class="check"><b>Vorteil:</b> Ein Coin wird nicht abgestraft, nur weil er kurzfristig schwächer ist, wenn er 7d/30d klar stärker als BTC bleibt.</div>
     </div>
   </div>
 
@@ -103,7 +125,7 @@
         <ul>
           <li>7-Tage-Trend</li>
           <li>30-Tage-Trend</li>
-          <li>Stärke gegenüber Bitcoin</li>
+          <li>BRSI: Stärke gegenüber Bitcoin über mehrere Zeiträume</li>
           <li>Relatives Volumen</li>
           <li>Liquidität</li>
           <li>Market Cap</li>
@@ -196,7 +218,7 @@
       <div class="check"><b>V4:</b> mehrere Positionen, Korb-Kauf und Depotansicht.</div>
       <div class="check"><b>V5:</b> Trading Engine mit Qualität, Entry, Risiko und Confidence.</div>
       <div class="check"><b>V5.1:</b> Roadmap, Strategie-Kennzahlen und Dokumentation.</div>
-      <div class="check"><b>V6 geplant:</b> technische Indikatoren, Backtesting, Lernfunktion und echte Pushs.</div>
+      <div class="check"><b>V5.3:</b> BRSI Multi-Zeitrahmen-Stärke gegen Bitcoin.</div><div class="check"><b>V6 geplant:</b> technische Indikatoren, Backtesting, Lernfunktion und echte Pushs.</div>
     </div>
   </div>
 </section>
@@ -207,9 +229,9 @@ const API="https://api.coingecko.com/api/v3",KEY="cryptoScoutV5",FIXED=["bitcoin
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}function eur(n){let x=Number(n)||0;if(Math.abs(x)<.01&&x!==0)return x.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:8})+" €";return x.toLocaleString("de-DE",{style:"currency",currency:"EUR"})}function pct(n){return(Number(n)||0).toFixed(2)+"%"}function clamp(n,a,b){return Math.max(a,Math.min(b,n))}function median(a){a=a.filter(x=>isFinite(x)).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:0}function tab(id,b){document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");render()}function status(t){document.getElementById("status").textContent=t}function load(on){document.getElementById("loader").classList.toggle("active",!!on)}
 async function markets(ids=null,per=100){let u=ids?`${API}/coins/markets?vs_currency=eur&ids=${encodeURIComponent(ids.join(","))}&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=1h,24h,7d,30d`:`${API}/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=${per}&page=1&sparkline=false&price_change_percentage=1h,24h,7d,30d`;let r=await fetch(u);if(!r.ok)throw new Error("CoinGecko Fehler / Rate Limit");return await r.json()}
 function marketPhase(all,btc){let btc24=btc?(btc.price_change_percentage_24h_in_currency??btc.price_change_percentage_24h??0):0,avg=all.slice(0,50).reduce((a,c)=>a+(c.price_change_percentage_24h_in_currency??c.price_change_percentage_24h??0),0)/Math.min(50,all.length);if(btc24>1.5&&avg>1)return"bull";if(btc24<-2||avg<-2)return"bear";return"neutral"}
-function evaluate(c,btc,med,phase){let ch1=c.price_change_percentage_1h_in_currency||0,ch24=c.price_change_percentage_24h_in_currency??c.price_change_percentage_24h??0,ch7=c.price_change_percentage_7d_in_currency||0,ch30=c.price_change_percentage_30d_in_currency||0,btc24=btc?(btc.price_change_percentage_24h_in_currency??btc.price_change_percentage_24h??0):0,rel=ch24-btc24,vol=c.total_volume||0,mcap=c.market_cap||0,turn=mcap?vol/mcap:0,relVol=med?turn/med:1,pos=[],neg=[],q=35,e=25,risk=0;
+function evaluate(c,btc,med,phase){let ch1=c.price_change_percentage_1h_in_currency||0,ch24=c.price_change_percentage_24h_in_currency??c.price_change_percentage_24h??0,ch7=c.price_change_percentage_7d_in_currency||0,ch30=c.price_change_percentage_30d_in_currency||0,btc1=btc?(btc.price_change_percentage_1h_in_currency||0):0,btc24=btc?(btc.price_change_percentage_24h_in_currency??btc.price_change_percentage_24h??0):0,btc7=btc?(btc.price_change_percentage_7d_in_currency||0):0,btc30=btc?(btc.price_change_percentage_30d_in_currency||0):0,rel1=ch1-btc1,rel24=ch24-btc24,rel7=ch7-btc7,rel30=ch30-btc30,rel=rel1*.10+rel24*.25+rel7*.40+rel30*.25,brsi=clamp(Math.round(50+rel*2),0,100),vol=c.total_volume||0,mcap=c.market_cap||0,turn=mcap?vol/mcap:0,relVol=med?turn/med:1,pos=[],neg=[],q=35,e=25,risk=0;
 if(ch7>15){q+=18;pos.push(["✅","7-Tage-Trend stark"])}else if(ch7>5){q+=11;pos.push(["✅","7-Tage-Trend positiv"])}else if(ch7<-10){q-=8;neg.push(["❌","7-Tage-Trend schwach"])}
-if(rel>5){q+=18;pos.push(["✅","stärker als Bitcoin"])}else if(rel>0){q+=9;pos.push(["➕","leicht stärker als BTC"])}else{q-=7;neg.push(["❌","schwächer als BTC"])}
+if(rel>5){q+=18;pos.push(["✅","BRSI: deutlich stärker als Bitcoin"])}else if(rel>0){q+=9;pos.push(["➕","BRSI: leicht stärker als BTC"])}else{q-=7;neg.push(["❌","BRSI: schwächer als BTC"])}
 if(relVol>2){q+=18;pos.push(["✅","relatives Volumen stark"])}else if(relVol>1.2){q+=10;pos.push(["✅","Volumen über Markt"])}else neg.push(["➖","relatives Volumen unauffällig"]);
 if(vol>50000000){q+=12;pos.push(["✅","Liquidität gut"])}else if(vol<5000000){q-=12;risk+=20;neg.push(["⚠️","zu wenig Liquidität"])}
 if(mcap>100000000){q+=10;pos.push(["✅","Market Cap ausreichend"])}else{q-=8;risk+=18;neg.push(["⚠️","sehr kleine Market Cap"])}
@@ -221,13 +243,13 @@ if(ch7>5&&ch7<40){e+=12}else if(ch7>45){e-=14;risk+=18;neg.push(["❌","7d über
 if(rel>0)e+=12;else e-=6;if(relVol>1.2&&relVol<5)e+=12;else if(relVol>6){e-=6;risk+=12;neg.push(["⚠️","Volumen-Spike kann Exhaustion sein"])}
 if(phase==="bear"){e-=15;neg.push(["❌","Marktphase bärisch"])}else if(phase==="bull"){e+=8;pos.push(["✅","Marktphase unterstützt Risiko"])}
 let stopPct=clamp(Math.max(Math.abs(ch24),Math.abs(ch7)/3,5)*.75,6,12),targetPct=clamp(stopPct*2.1,13,28),rr=targetPct/stopPct;if(rr>=2){e+=8;pos.push(["✅","Chance/Risiko über 2"])}
-q=clamp(Math.round(q),0,100);e=clamp(Math.round(e),0,100);risk=clamp(Math.round(risk),0,100);let conf=clamp(Math.round(q*.35+e*.45+(100-risk)*.20),0,100),decision="NICHT KAUFEN",color="red";if(q>=70&&e>=75&&risk<=55&&conf>=70){decision="KAUFEN";color="green"}else if(q>=65&&e>=55&&conf>=60){decision="BEOBACHTEN";color="yellow"}else if(q>=60&&e<55){decision="WARTEN";color="orange"}if(!neg.length)neg.push(["➖","keine starken Gegenargumente"]);return{...c,ch1,ch24,ch7,ch30,rel,relVol,quality:q,entry:e,risk,confidence:conf,decision,color,pos,neg,stop:c.current_price*(1-stopPct/100),target:c.current_price*(1+targetPct/100),rr,marketMood:phase}}
+q=clamp(Math.round(q),0,100);e=clamp(Math.round(e),0,100);risk=clamp(Math.round(risk),0,100);let conf=clamp(Math.round(q*.35+e*.45+(100-risk)*.20),0,100),decision="NICHT KAUFEN",color="red";if(q>=70&&e>=75&&risk<=55&&conf>=70){decision="KAUFEN";color="green"}else if(q>=65&&e>=55&&conf>=60){decision="BEOBACHTEN";color="yellow"}else if(q>=60&&e<55){decision="WARTEN";color="orange"}if(!neg.length)neg.push(["➖","keine starken Gegenargumente"]);return{...c,ch1,ch24,ch7,ch30,rel,rel1,rel24,rel7,rel30,brsi,relVol,quality:q,entry:e,risk,confidence:conf,decision,color,pos,neg,stop:c.current_price*(1-stopPct/100),target:c.current_price*(1+targetPct/100),rr,marketMood:phase}}
 async function scan(){try{load(true);status("Scan läuft");let per=Number(document.getElementById("scanSize").value||100),[top,fixed]=await Promise.all([markets(null,per),markets(FIXED,250)]),map=new Map();[...top,...fixed].forEach(c=>map.set(c.id,c));let all=[...map.values()],btc=all.find(c=>c.id==="bitcoin"),med=median(all.map(c=>c.market_cap?c.total_volume/c.market_cap:0).filter(x=>x>0)),phase=marketPhase(all,btc);state.scans=all.map(c=>evaluate(c,btc,med,phase)).sort((a,b)=>b.confidence-a.confidence);state.lastScan="Letzter Scan: "+new Date().toLocaleString("de-DE");pushEquity();save();checkSellSignals();status("Scan fertig")}catch(e){alert(e.message);status("Fehler")}finally{load(false)}}
 function equity(){return state.cash+state.positions.reduce((a,p)=>a+p.qty*(p.lastPrice||p.entry),0)}function pushEquity(){let v=equity(),l=state.equity.at(-1);if(!l||Math.abs(l.value-v)>.001){state.equity.push({date:new Date().toISOString(),value:v});if(state.equity.length>160)state.equity=state.equity.slice(-160)}}function prepare(c){tradeId.value=c.id;tradeSymbol.value=c.symbol.toUpperCase();tradePrice.value=c.current_price;tradeAmount.value=Math.min(state.cash,100).toFixed(2);stopLoss.value=c.stop.toFixed(8);takeProfit.value=c.target.toFixed(8);tradeNote.value=`${c.decision}. Qualität ${c.quality}/100, Einstieg ${c.entry}/100, Risiko ${c.risk}/100, Confidence ${c.confidence}/100.`;document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById("trade").classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab")[2].classList.add("active");render()}
 function buyOne(){let id=tradeId.value.trim(),symbol=tradeSymbol.value.trim().toUpperCase(),entry=Number(tradePrice.value),amount=Number(tradeAmount.value),stop=Number(stopLoss.value),target=Number(takeProfit.value),note=tradeNote.value.trim();if(!id||!symbol||!entry||!amount)return alert("Daten fehlen.");if(amount>state.cash)return alert("Nicht genug Cash.");if(state.positions.find(p=>p.id===id))return alert("Position schon offen.");state.cash-=amount;state.positions.push({id,symbol,entry,amount,qty:amount/entry,stop,target,note,date:new Date().toISOString(),lastPrice:entry});state.history.push({type:"BUY",id,symbol,entry,amount,note,date:new Date().toISOString()});pushEquity();save()}
 function candidates(kind){let max=Number(basketCount.value||5),list=state.scans.filter(c=>c.id!=="bitcoin"&&!state.positions.find(p=>p.id===c.id));list=kind==="entry"?list.filter(c=>c.decision==="KAUFEN"):list.filter(c=>c.decision==="KAUFEN"||c.decision==="BEOBACHTEN");return list.slice(0,max)}function openBasket(picks,label){if(!picks.length)return alert("Keine passenden Kandidaten.");let total=Number(basketAmount.value)||state.cash;if(total>state.cash)return alert("Nicht genug Cash.");let weights=picks.map(c=>Math.max(c.confidence-55,5)),sum=weights.reduce((a,b)=>a+b,0),alloc=weights.map(w=>total*w/sum);if(Math.min(...alloc)<1)return alert("Betrag pro Coin zu klein.");if(!confirm(`${picks.length} Kandidaten kaufen? ${label}`))return;picks.forEach((c,i)=>{let amount=alloc[i],entry=c.current_price;state.cash-=amount;state.positions.push({id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,qty:amount/entry,stop:c.stop,target:c.target,note:`${label}. Q${c.quality}/E${c.entry}/R${c.risk}/C${c.confidence}`,date:new Date().toISOString(),lastPrice:entry,quality:c.quality,entryScore:c.entry,risk:c.risk,confidence:c.confidence});state.history.push({type:"BUY",id:c.id,symbol:c.symbol.toUpperCase(),entry,amount,note:`${label}. Q${c.quality}/E${c.entry}/R${c.risk}/C${c.confidence}`,date:new Date().toISOString()})});pushEquity();save()}function buyEntryBasket(){openBasket(candidates("entry"),"Korb nur KAUFEN")}function buyWatchBasket(){openBasket(candidates("watch"),"Korb KAUFEN+BEOBACHTEN")}
 async function refreshPositions(){if(!state.positions.length)return;try{status("Aktualisiere");let data=await markets(state.positions.map(p=>p.id),250),by=new Map(data.map(c=>[c.id,c]));state.positions.forEach(p=>{let c=by.get(p.id);if(c)p.lastPrice=c.current_price});pushEquity();save();checkSellSignals();status("Aktualisiert")}catch(e){alert(e.message);status("Fehler")}}function sellAt(i,part=1){let p=state.positions[i];if(!p)return;let exit=p.lastPrice||p.entry,qty=p.qty*part,value=qty*exit,amount=p.amount*part,pl=value-amount;state.cash+=value;state.history.push({type:part<1?"PART SELL":"SELL",id:p.id,symbol:p.symbol,entry:p.entry,exit,amount,pl,note:p.note,date:new Date().toISOString()});if(part>=1)state.positions.splice(i,1);else{p.qty-=qty;p.amount-=amount}pushEquity();save()}function management(p){let last=p.lastPrice||p.entry,pp=(last/p.entry-1)*100,msg="HALTEN",color="yellow";if(p.stop&&last<=p.stop){msg="VERKAUF PRÜFEN";color="red"}else if(p.target&&last>=p.target){msg="TEILGEWINN PRÜFEN";color="green"}else if(pp>=12){msg="STOP ANZIEHEN";color="green"}else if(pp<=-10){msg="RISIKO REDUZIEREN";color="red"}return{msg,color,pp}}
-function card(c){return `<div class="coin"><div class="head"><div><div class="name">${c.symbol.toUpperCase()} · ${c.name}</div><div class="sub">${c.id}</div></div><div class="score ${c.color}" style="--s:${c.confidence}">${c.confidence}</div></div><div><span class="pill ${c.color}">${c.decision}</span> <span class="pill">Markt: ${c.marketMood}</span> <span class="pill">R/R ${c.rr.toFixed(1)}</span></div><div class="metrics"><div class="metric"><span class="label">Qualität</span><b>${c.quality}/100</b></div><div class="metric"><span class="label">Einstieg</span><b>${c.entry}/100</b></div><div class="metric"><span class="label">Risiko</span><b class="${c.risk>60?'badText':c.risk>35?'warnText':'goodText'}">${c.risk}/100</b></div><div class="metric"><span class="label">Confidence</span><b>${c.confidence}/100</b></div><div class="metric"><span class="label">24h</span><b class="${c.ch24>=0?'goodText':'badText'}">${pct(c.ch24)}</b></div><div class="metric"><span class="label">Rel. Vol</span><b>${c.relVol.toFixed(2)}x</b></div><div class="metric"><span class="label">BTC-Stärke</span><b class="${c.rel>=0?'goodText':'badText'}">${pct(c.rel)}</b></div><div class="metric"><span class="label">Stop</span><b>${eur(c.stop)}</b></div><div class="metric"><span class="label">Ziel</span><b>${eur(c.target)}</b></div></div><div class="columns"><div><b>Warum dafür?</b><div class="reasonGrid">${c.pos.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div><div><b>Warum nicht kaufen?</b><div class="reasonGrid">${c.neg.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div></div><div class="actions"><button class="good" onclick='prepare(${JSON.stringify(c).replaceAll("'","&apos;")})'>Trade vorbereiten</button></div></div>`}
+function card(c){return `<div class="coin"><div class="head"><div><div class="name">${c.symbol.toUpperCase()} · ${c.name}</div><div class="sub">${c.id}</div></div><div class="score ${c.color}" style="--s:${c.confidence}">${c.confidence}</div></div><div><span class="pill ${c.color}">${c.decision}</span> <span class="pill">Markt: ${c.marketMood}</span> <span class="pill">R/R ${c.rr.toFixed(1)}</span></div><div class="metrics"><div class="metric"><span class="label">Qualität</span><b>${c.quality}/100</b></div><div class="metric"><span class="label">Einstieg</span><b>${c.entry}/100</b></div><div class="metric"><span class="label">Risiko</span><b class="${c.risk>60?'badText':c.risk>35?'warnText':'goodText'}">${c.risk}/100</b></div><div class="metric"><span class="label">Confidence</span><b>${c.confidence}/100</b></div><div class="metric"><span class="label">24h</span><b class="${c.ch24>=0?'goodText':'badText'}">${pct(c.ch24)}</b></div><div class="metric"><span class="label">Rel. Vol</span><b>${c.relVol.toFixed(2)}x</b></div><div class="metric"><span class="label">BRSI</span><b class="${c.brsi>=50?'goodText':'badText'}">${c.brsi}/100</b></div><div class="metric"><span class="label">Stop</span><b>${eur(c.stop)}</b></div><div class="metric"><span class="label">Ziel</span><b>${eur(c.target)}</b></div></div><div class="notice"><b>BTC Relative Strength:</b> 1h ${pct(c.rel1)} · 24h ${pct(c.rel24)} · 7d ${pct(c.rel7)} · 30d ${pct(c.rel30)}</div><div class="columns"><div><b>Warum dafür?</b><div class="reasonGrid">${c.pos.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div><div><b>Warum nicht kaufen?</b><div class="reasonGrid">${c.neg.slice(0,7).map(r=>`<div class="reason"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div></div></div><div class="actions"><button class="good" onclick='prepare(${JSON.stringify(c).replaceAll("'","&apos;")})'>Trade vorbereiten</button></div></div>`}
 
 const ROADMAP_DONE=[
  "Qualität-, Einstieg-, Risiko- und Confidence-Score",
@@ -242,7 +264,8 @@ const ROADMAP_DONE=[
  "Auto-Wächter solange App offen ist",
  "Journal und JSON-Export",
  "Sticky Menü oben",
- "Roadmap/Entwicklungsstand"
+ "Roadmap/Entwicklungsstand",
+ "BRSI Multi-Zeitrahmen-Stärke gegen Bitcoin"
 ];
 const ROADMAP_WORK=[
  "Gewichtung der Entry-Regeln anhand Paper-Trades verbessern",
